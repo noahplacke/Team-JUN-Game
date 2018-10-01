@@ -1,0 +1,42 @@
+10/01 - Sprint 2 Planning
+
+    - Find background image to use
+    - Upgrade units as you go through the game, could do it in between levels
+    - 3 units 
+        1) Students - student to frat guy to football players
+        2) Faculty - LA to TA to professor [RANGED]
+        3) Exec - Dean to President to Obama
+    - Powerups
+        1) Wave of freshman
+        2) Bevo raid
+        3) McConaghuey 
+        4) Tuition bomb
+        
+    - Powerups for TAMU
+        1) Their dog
+        2) Cowboys
+        3) Military Personel
+        
+    - First Level is UT vs A&M
+    - Second Level is UT vs OU
+    - Third Level is potential national championship game
+    
+    
+    TO DO FOR SPRINT 2
+    
+        ART
+        
+        1) Finding background image
+        2) Make assets for level 1 units, and powerups
+        3) Make assets for Tower and something for A&M's "flag"
+        3) Make assets for the units/powerups bar
+        4) Make assets for opponents level 1 units and powerups
+        5) Music
+        
+        GAMEPLAY
+        1) Sending units out 
+        2) Spawn opponents units/powerups
+        2) Attacking opponents defenses/units
+        3) Getting to "flag"/"mascot" 
+    
+    
