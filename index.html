@@ -80,7 +80,7 @@
                 var music = game.add.audio('sprint1_music');
                 music.play();
                 
-                var style = { font: "65px Arial", fill: "#ff0044", align: "center" };
+                var style = { font: "30px Arial", fill: "#ff0044", align: "center" };
                 var text = game.add.text(game.world.centerX, game.world.centerY, "Where we will continue our game...", style);
                 text.anchor.set(0.5);
                 
@@ -106,12 +106,12 @@
             },
             create: function () {
                 //add logic here
-                background = game.add.sprite(0, 0, 'main_menu');
-                               
-                var style = { font: "65px Arial", fill: "#ff0044", align: "center" };
-                var text1 = game.add.text(game.world.centerX, game.world.centerY - 10, "Core Contributors", style);
-                var text2 = game.add.text(game.world.centerX, game.world.centerY, "Jin Choi Noah Placke Usman Siddiqui", style);
-
+                //background = game.add.sprite(0, 0, 'main_menu');
+                var style1 = {font: "45px Arial", fill: "#ff0044", align: "center"};
+                var text1 = game.add.text(game.world.centerX, game.world.centerY-35, "Core Contributors", style1);
+                var style2 = {font: "30px Arial", fill: "#ff0044", align: "center"};
+                var text2 = game.add.text(game.world.centerX, game.world.centerY, "Jin Choi | Noah Placke | Usman Siddiqui", style2);
+                text1.anchor.set(0.5);
                 text2.anchor.set(0.5);
                 var exit = game.add.button(700, 600, 'button', "", this, 1, 1, 1);
                 exit.frame = 1;
