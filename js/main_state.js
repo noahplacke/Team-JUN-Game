@@ -63,7 +63,7 @@ mascot_raid.main_state.prototype = {
 		rain_pow.frame = 3;
 		rain_pow.fixedToCamera = true;
 
-		var exit = game.add.button(700, 25, 'button', "", this, 1, 1, 1);
+		var exit = game.add.button(700, 625, 'button', "", this, 1, 1, 1);
 		exit.frame = 1;
 		exit.fixedToCamera = true;
 		exit.onInputDown.add(exit_pressed, this);
@@ -89,6 +89,23 @@ mascot_raid.main_state.prototype = {
 		enemy = game.add.group();
 		enemy.enableBody = true;
 		enemy.physicsBodyType = Phaser.Physics.ARCADE;
+		var unit_timer = (function(){
+			setInterval(deploy_units, 250);
+		})();
+
+		balls = game.add.group();
+		balls.enableBody = true;
+		balls.physicsBodyType = Phaser.Physics.ARCADE;
+
+		for (var i = 0; i < 30; i++)
+		{
+			var b = balls.create(0, 0, 'ball');
+			b.name = 'ball' + i;
+			b.exists = false;
+			b.visible = false;
+			b.checkWorldBounds = true;
+			b.events.onOutOfBounds.add(resetball, this);
+		}
 
 		cursors = game.input.keyboard.createCursorKeys();
 		game.input.keyboard.addKeyCapture([ Phaser.Keyboard.SPACEBAR ]);
@@ -128,8 +145,8 @@ function throwball () {
 
         if (ball)
         {
-            ball.reset(sprite.x + 6, sprite.y + 600);
-            ball.body.velocity.x = 300;
+            ball.reset(200, game.world.height - 300);
+            ball.body.velocity.x = 1500;
             ballTime = game.time.now + 150;
         }
     }
@@ -148,4 +165,13 @@ function collisionHandler (ball, ene) {
     ball.kill();
     ene.kill();
 
+}
+
+function deploy_units (){
+	console.log("units made");
+	var e = enemy.create(2200 + Math.random() * 400, game.world.height - 300 + Math.random() * 10, 'enemy' , 1);
+	e.frame = 1;
+	e.body.velocity.x = - 200;
+	e.animations.add('left', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], 16, true);
+	e.animations.play('left');
 }

@@ -13,7 +13,8 @@ mascot_raid.game_scene_0.prototype = {
         //add logic here
         background = game.add.sprite(0, 0, 'main_menu');
         var music = game.add.audio('sprint1_music');
-        music.play();
+
+        //music.play();
 
         var style = { font: "30px Arial", fill: "#ff0044", align: "center" };
         var text = game.add.text(game.world.centerX, game.world.centerY, "Where we will continue our game...", style);
