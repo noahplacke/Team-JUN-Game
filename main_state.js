@@ -7,6 +7,7 @@ mascot_raid.main_state.prototype = {
         game.load.image('ground', 'assets/ground.png');
         game.load.spritesheet('tree', 'assets/trees.png');
         game.load.spritesheet('powerups', 'assets/powerup_buttons.png', 64, 64, 4);
+        game.load.spritesheet('landmarks', 'assets/landmarks.png', 480, 600, 2);
 
     },
 
@@ -41,6 +42,10 @@ mascot_raid.main_state.prototype = {
         var rain_pow = game.add.button(260, 675, 'powerups', "", this, 3, 3, 3);
         rain_pow.frame = 3;
         rain_pow.fixedToCamera = true;
+        
+        //inserting landmarks
+        var ut_tower = immovable.create(0, 0, 'landmarks', 0);
+        var am_tower = immovable.create(1920, 0, 'landmarks', 1);
 
 
     },
