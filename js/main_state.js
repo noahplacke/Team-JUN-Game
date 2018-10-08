@@ -23,6 +23,7 @@ mascot_raid.main_state.prototype = {
 		game.load.audio('sprint1_music', 'assets/sprint1_music.mp3')
 		game.load.image('ball', 'assets/ball.png');
 		game.load.spritesheet('enemy', 'assets/enemy.png', 32, 32);
+		game.load.spritesheet('landmarks', 'assets/landmarks.png', 480, 600, 2);
 		console.log("In game");
 
 	},
@@ -67,6 +68,8 @@ mascot_raid.main_state.prototype = {
 		exit.fixedToCamera = true;
 		exit.onInputDown.add(exit_pressed, this);
 
+		var ut_tower = immovable.create(0, 0, 'landmarks', 0);
+        var am_tower = immovable.create(1920, 0, 'landmarks', 1);
 
 		myUnits = game.add.group();
 		bevo = game.add.group();
@@ -75,7 +78,6 @@ mascot_raid.main_state.prototype = {
 		rain = game.add.group();
 
 		myUnits.add(bevo, matt, horde, rain);
-
 
 		// bevo_pow.onInputDown.add(deploy_bevo, this);
 		// matt_pow.onInputDown.add(deploy_matt, this);
@@ -87,31 +89,6 @@ mascot_raid.main_state.prototype = {
 		enemy = game.add.group();
 		enemy.enableBody = true;
 		enemy.physicsBodyType = Phaser.Physics.ARCADE;
-
-		for (var i = 0; i < 50; i++)
-		{
-			var e = enemy.create(game.world.height - 200, 2300 + Math.random() * 100, 'enemy', game.rnd.integerInRange(0, 36));
-			e.name = 'enemy' + i;
-			e.body.velocity.x = - 300;
-		}
-
-
-		balls = game.add.group();
-		balls.enableBody = true;
-		balls.physicsBodyType = Phaser.Physics.ARCADE;
-
-		for (var i = 0; i < 30; i++)
-		{
-			var b = balls.create(0, 0, 'ball');
-			b.name = 'ball' + i;
-			b.exists = false;
-			b.visible = false;
-			b.checkWorldBounds = true;
-			b.events.onOutOfBounds.add(resetball, this);
-		}
-
-		sprite = game.add.sprite(400, 550, 'phaser');
-		game.physics.enable(sprite, Phaser.Physics.ARCADE);
 
 		cursors = game.input.keyboard.createCursorKeys();
 		game.input.keyboard.addKeyCapture([ Phaser.Keyboard.SPACEBAR ]);
