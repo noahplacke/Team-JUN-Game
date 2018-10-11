@@ -24,6 +24,8 @@ mascot_raid.main_state.prototype = {
 		game.load.image('ball', 'assets/ball.png');
 		game.load.spritesheet('enemy', 'assets/enemy.png', 32, 32);
 		game.load.spritesheet('landmarks', 'assets/landmarks.png', 480, 600, 2);
+        game.load.spritesheet('place_buttons', 'assets/placehold_buttons.png', 64, 64, 3);
+        game.load.spritesheet('place_unit', 'assets/placehold_unit.png', 64, 64, 3);
 		console.log("In game");
 
 	},
@@ -41,6 +43,7 @@ mascot_raid.main_state.prototype = {
 		//physics for immovable objects
 		immovable = game.add.group();
 		immovable.enableBody = true;
+        immovable.physicsBodyType = Phaser.Physics.ARCADE;
 		var floor = immovable.create(0, 0, 'ground');
 		floor.body.immovable = true;
 
@@ -51,33 +54,47 @@ mascot_raid.main_state.prototype = {
 		buttons = game.add.group();
 		buttons.fixedToCamera = true;
 		var bevo_pow = game.add.button(50, 675, 'powerups', "", this, 0, 0, 0);
-		bevo_pow.frame = 0;
 		bevo_pow.fixedToCamera = true;
 		var matt_pow = game.add.button(120, 675, 'powerups', "", this, 1, 1, 1);
-		matt_pow.frame = 1;
 		matt_pow.fixedToCamera = true;
 		var horde_pow = game.add.button(190, 675, 'powerups', "", this, 2, 2, 2);
-		horde_pow.frame = 2;
 		horde_pow.fixedToCamera = true;
 		var rain_pow = game.add.button(260, 675, 'powerups', "", this, 3, 3, 3);
-		rain_pow.frame = 3;
 		rain_pow.fixedToCamera = true;
 
 		var exit = game.add.button(700, 625, 'button', "", this, 1, 1, 1);
-		exit.frame = 1;
 		exit.fixedToCamera = true;
 		exit.onInputDown.add(exit_pressed, this);
-
+        
+        //add landmarks
 		var ut_tower = immovable.create(0, 0, 'landmarks', 0);
         var am_tower = immovable.create(1920, 0, 'landmarks', 1);
-
-		myUnits = game.add.group();
+        
+        //add buttons to send units
+        var stu_button = game.add.button(400, 675, 'place_buttons', "", this, 0);
+        stu_button.fixedToCamera = true;
+        stu_button.onInputDown.add(sendUnit1, this);
+        var fac_button = game.add.button(470, 675, 'place_buttons', "", this, 1, 1);
+        fac_button.fixedToCamera = true;
+        fac_button.onInputDown.add(sendUnit2, this);
+        var exec_button = game.add.button(540, 675, 'place_buttons', "", this, 2, 2);
+        exec_button.fixedToCamera = true;
+        exec_button.onInputDown.add(sendUnit3, this);
+        
+        //create unit group
+        myUnits = game.add.group();
+        myUnits.enableBody = true;
+        myUnits.physicsBodyType = Phaser.Physics.ARCADE;
+        myUnits.setAll('checkWorldBounds', true);
+        myUnits.setAll('outOfBoundsKill', true);
+        
+		myPowers = game.add.group();
 		bevo = game.add.group();
 		matt = game.add.group();
 		horde = game.add.group();
 		rain = game.add.group();
 
-		myUnits.add(bevo, matt, horde, rain);
+		myPowers.add(bevo, matt, horde, rain);
 
 		// bevo_pow.onInputDown.add(deploy_bevo, this);
 		// matt_pow.onInputDown.add(deploy_matt, this);
@@ -117,6 +134,9 @@ mascot_raid.main_state.prototype = {
 
 	update: function() {
 		game.physics.arcade.overlap(balls, enemy, collisionHandler, null, this);
+        game.physics.arcade.overlap(myUnits, enemy, collisionHandler2, null, this);
+
+        
 
 		//scroll the map by dragging with mouse
 		if (this.game.input.activePointer.isDown) {
@@ -167,6 +187,13 @@ function collisionHandler (ball, ene) {
 
 }
 
+function collisionHandler2 (myUnits, ene) {
+
+    myUnits.kill();
+    ene.kill();
+
+}
+
 function deploy_units (){
 	console.log("units made");
 	var e = enemy.create(2200 + Math.random() * 400, game.world.height - 300 + Math.random() * 10, 'enemy' , 1);
@@ -174,4 +201,25 @@ function deploy_units (){
 	e.body.velocity.x = - 200;
 	e.animations.add('left', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], 16, true);
 	e.animations.play('left');
+}
+
+function sendUnit1 (){
+    console.log('student sent');
+    var stu = myUnits.create (400, game.world.height - 300 + Math.random() * 10, 'place_unit', 0);
+    stu.body.velocity.x = 200;
+    
+}
+
+function sendUnit2 (){
+    console.log('faculty sent');
+    var fac = myUnits.create (400, game.world.height - 300 + Math.random() * 10, 'place_unit', 1);
+    fac.body.velocity.x = 200;
+    
+}
+
+function sendUnit3 (){
+    console.log('exec sent');
+    var exec = myUnits.create (400, game.world.height - 300 + Math.random() * 10, 'place_unit', 2);
+    exec.body.velocity.x = 200;
+    
 }
