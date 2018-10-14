@@ -201,12 +201,17 @@ function deploy_units (){
 	e.body.velocity.x = - 200;
 	e.animations.add('left', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], 16, true);
 	e.animations.play('left');
+    
 }
 
 function sendUnit1 (){
     console.log('student sent');
     var stu = myUnits.create (400, game.world.height - 300 + Math.random() * 10, 'place_unit', 0);
     stu.body.velocity.x = 200;
+    var stu = {
+        health: 1000,
+        attack: 50,
+    };
     
 }
 
@@ -214,6 +219,10 @@ function sendUnit2 (){
     console.log('faculty sent');
     var fac = myUnits.create (400, game.world.height - 300 + Math.random() * 10, 'place_unit', 1);
     fac.body.velocity.x = 200;
+    var fac = {
+        health: 750,
+        attack: 40,
+    };
     
 }
 
@@ -221,5 +230,9 @@ function sendUnit3 (){
     console.log('exec sent');
     var exec = myUnits.create (400, game.world.height - 300 + Math.random() * 10, 'place_unit', 2);
     exec.body.velocity.x = 200;
+    var exec = {
+        health: 2000,
+        attack: 80,
+    };
     
 }
