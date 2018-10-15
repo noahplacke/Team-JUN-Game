@@ -5,8 +5,10 @@ var horde;
 var rain;
 var balls;
 var enemy;
+var lvl1;
+var lvl2;
+var lvl3;
 var cursors;
-var tower;
 
 var ballTime = 0;
 var ball;
@@ -23,12 +25,13 @@ mascot_raid.main_state.prototype = {
 		game.load.spritesheet('button', 'assets/button_sprite_sheet.png', 100, 100, 4);
 		game.load.audio('sprint1_music', 'assets/sprint1_music.mp3')
 		game.load.image('ball', 'assets/ball.png');
-		game.load.spritesheet('enemy', 'assets/enemy.png', 32, 32);
+		game.load.image('money', 'assets/money.png');
+		game.load.spritesheet('lvl1', 'assets/enemy.png', 32, 32);
+		game.load.spritesheet('lvl2', 'assets/lvl2.png', 50.5, 100);
+		game.load.spritesheet('lvl3', 'assets/lvl3.png', 24.5, 32);
 		game.load.spritesheet('landmarks', 'assets/landmarks.png', 480, 600, 2);
         game.load.spritesheet('place_buttons', 'assets/placehold_buttons.png', 64, 64, 3);
         game.load.spritesheet('place_unit', 'assets/placehold_unit.png', 64, 64, 3);
-        game.load.image('tower', 'assets/tower.png');
-        game.load.image('bevo', 'assets/bevo.png');
 		console.log("In game");
 
 	},
@@ -58,23 +61,22 @@ mascot_raid.main_state.prototype = {
 		buttons.fixedToCamera = true;
 		var bevo_pow = game.add.button(50, 675, 'powerups', "", this, 0, 0, 0);
 		bevo_pow.fixedToCamera = true;
-        bevo_pow.onInputDown.add(deploy_bevo, this);
 		var matt_pow = game.add.button(120, 675, 'powerups', "", this, 1, 1, 1);
 		matt_pow.fixedToCamera = true;
-        matt_pow.onInputDown.add(deploy_matt, this);
 		var horde_pow = game.add.button(190, 675, 'powerups', "", this, 2, 2, 2);
 		horde_pow.fixedToCamera = true;
 		var rain_pow = game.add.button(260, 675, 'powerups', "", this, 3, 3, 3);
 		rain_pow.fixedToCamera = true;
+		rain_pow.onInputDown.add(make_it_rain, this);
 
 		var exit = game.add.button(700, 625, 'button', "", this, 1, 1, 1);
 		exit.fixedToCamera = true;
 		exit.onInputDown.add(exit_pressed, this);
-        
+
         //add landmarks
 		var ut_tower = immovable.create(0, 0, 'landmarks', 0);
         var am_tower = immovable.create(1920, 0, 'landmarks', 1);
-        
+
         //add buttons to send units
         var stu_button = game.add.button(400, 675, 'place_buttons', "", this, 0);
         stu_button.fixedToCamera = true;
@@ -85,43 +87,55 @@ mascot_raid.main_state.prototype = {
         var exec_button = game.add.button(540, 675, 'place_buttons', "", this, 2, 2);
         exec_button.fixedToCamera = true;
         exec_button.onInputDown.add(sendUnit3, this);
-        
+
         //create unit group
         myUnits = game.add.group();
         myUnits.enableBody = true;
         myUnits.physicsBodyType = Phaser.Physics.ARCADE;
         myUnits.setAll('checkWorldBounds', true);
         myUnits.setAll('outOfBoundsKill', true);
-        
+
 		myPowers = game.add.group();
-        myPowers.enableBody = true;
-        myPowers.physicalBodyType = Phaser.Physics.ARCADE;
-        myPowers.setAll('checkWorldBounds', true);
-        myPowers.setAll('outOfBoundsKill', true);
 		bevo = game.add.group();
 		matt = game.add.group();
 		horde = game.add.group();
 		rain = game.add.group();
+		rain.enableBody = true;
+		rain.physicsBodyType = Phaser.Physics.ARCADE;
 
 		myPowers.add(bevo, matt, horde, rain);
 
+		// bevo_pow.onInputDown.add(deploy_bevo, this);
+		// matt_pow.onInputDown.add(deploy_matt, this);
 		// horde_pow.onInputDown.add(deploy_horde, this);
 		// rain_pow.onInputDown.add(deploy_rain, this);
 
 		//  This will check Group vs. Group collision (balls vs. enemy!)
 
 		enemy = game.add.group();
+		lvl1 = game.add.group();
+		lvl1.enableBody = true;
+		lvl1.physicsBodyType = Phaser.Physics.ARCADE;
+		lvl2 = game.add.group();
+		lvl2.enableBody = true;
+		lvl2.physicsBodyType = Phaser.Physics.ARCADE;
+		lvl3 = game.add.group();
+		lvl3.enableBody = true;
+		lvl3.physicsBodyType = Phaser.Physics.ARCADE;
+		enemy.add(lvl1);
+		enemy.add(lvl2);
+		enemy.add(lvl3);
 		enemy.enableBody = true;
 		enemy.physicsBodyType = Phaser.Physics.ARCADE;
 		var unit_timer = (function(){
-			setInterval(deploy_units, 250);
+			setInterval(deploy_lvl1, 250);
+			setInterval(deploy_lvl2, 500);
+			setInterval(deploy_lvl3, 1000);
 		})();
 
 		balls = game.add.group();
 		balls.enableBody = true;
 		balls.physicsBodyType = Phaser.Physics.ARCADE;
-        balls.setAll('checkWorldBounds', true);
-        balls.setAll('outOfBoundsKill', true);
 
 		for (var i = 0; i < 30; i++)
 		{
@@ -138,17 +152,15 @@ mascot_raid.main_state.prototype = {
 
 
 		addKeyListen();
-        
-        // add tower self defense
-        var tower = game.add.sprite(210, 85, 'tower');
 
 	},
 
 	update: function() {
 		game.physics.arcade.overlap(balls, enemy, collisionHandler, null, this);
         game.physics.arcade.overlap(myUnits, enemy, collisionHandler2, null, this);
+		game.physics.arcade.overlap(rain, enemy, collisionHandler3, null, this);
 
-        
+
 
 		//scroll the map by dragging with mouse
 		if (this.game.input.activePointer.isDown) {
@@ -206,14 +218,52 @@ function collisionHandler2 (myUnits, ene) {
 
 }
 
-function deploy_units (){
+function collisionHandler3 (money, ene) {
+
+    ene.kill();
+
+}
+
+function make_it_rain() {
+	for (i = 0; i < 50; i++){
+		var e = rain.create(Math.random() * game.world.width, 0, 'money', 0);
+		e.frame = 0;
+		e.body.velocity.y = 200;
+	}
+}
+
+function deploy_lvl1 (){
 	console.log("units made");
-	var e = enemy.create(2200 + Math.random() * 400, game.world.height - 300 + Math.random() * 10, 'enemy' , 1);
-	e.frame = 1;
+	var e = enemy.create(2200 + Math.random() * 400, game.world.height - 300 + Math.random() * 10, 'lvl1' , 0);
+	e.frame = 0;
 	e.body.velocity.x = - 200;
 	e.animations.add('left', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], 16, true);
 	e.animations.play('left');
-    
+
+}
+
+function deploy_lvl2 (){
+	console.log("units made");
+	var e = enemy.create(2200 + Math.random() * 400, game.world.height - 350 + Math.random() * 10, 'lvl2' , 0);
+	e.anchor.setTo(.5,.5);
+	e.scale.x *= -1;
+	e.frame = 0;
+	e.body.velocity.x = - 200;
+	e.animations.add('left', [10, 11,12,13,14,15,16], 7, true);
+	e.animations.play('left');
+
+}
+
+function deploy_lvl3 (){
+	console.log("units made");
+	var e = enemy.create(2200 + Math.random() * 400, game.world.height - 300 + Math.random() * 10, 'lvl3' , 0);
+	e.anchor.setTo(.5,.5);
+	e.scale.x *= -1;
+	e.frame = 0;
+	e.body.velocity.x = - 200;
+	e.animations.add('left', [38,39,40], 3, true);
+	e.animations.play('left');
+
 }
 
 function sendUnit1 (){
@@ -224,7 +274,7 @@ function sendUnit1 (){
         health: 1000,
         attack: 50,
     };
-    
+
 }
 
 function sendUnit2 (){
@@ -235,7 +285,7 @@ function sendUnit2 (){
         health: 750,
         attack: 40,
     };
-    
+
 }
 
 function sendUnit3 (){
@@ -246,36 +296,5 @@ function sendUnit3 (){
         health: 2000,
         attack: 80,
     };
-    
-}
 
-function tower_fire (){
-    balls.createMultiple(1, 'ball', 0, false);
-    if (game.time.now > tower.fireLastTime) {
-        const balls = balls.getFirstExists(false);
-        if (balls && typeof enemies.children[0] != "undefined") {
-            balls.reset(tower.x, tower.y);
-            balls.body.collideWorldBounds = false;
-            balls.rotation = game.physics.arcade.moveToObject(bullet, enemy.children[0], 300);
-        }
-        tower.fireLastTime = game.time.now + tower.fireTime;
-    }
-}
-
-function tower_def (tower, ene){
-    if (Phaser.Math.distance(this.tower.x, this.tower.y, this.ene.x, this.ene.y) < 650)
-        {
-            this.tower.tower_fire;
-            console.log('firing');
-        }
-}
-
-function deploy_bevo (){
-    console.log('bevo sent');
-    var bevo = myPowers.create(400, game.world.height - 300, 'bevo');
-    bevo.body.velocity.x = 300;
-}
-
-function deploy_matt (){
-    console.log('matt deployed');
 }
