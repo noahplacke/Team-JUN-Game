@@ -6,6 +6,7 @@ var rain;
 var balls;
 var enemy;
 var cursors;
+var tower;
 
 var ballTime = 0;
 var ball;
@@ -26,6 +27,8 @@ mascot_raid.main_state.prototype = {
 		game.load.spritesheet('landmarks', 'assets/landmarks.png', 480, 600, 2);
         game.load.spritesheet('place_buttons', 'assets/placehold_buttons.png', 64, 64, 3);
         game.load.spritesheet('place_unit', 'assets/placehold_unit.png', 64, 64, 3);
+        game.load.image('tower', 'assets/tower.png');
+        game.load.image('bevo', 'assets/bevo.png');
 		console.log("In game");
 
 	},
@@ -55,8 +58,10 @@ mascot_raid.main_state.prototype = {
 		buttons.fixedToCamera = true;
 		var bevo_pow = game.add.button(50, 675, 'powerups', "", this, 0, 0, 0);
 		bevo_pow.fixedToCamera = true;
+        bevo_pow.onInputDown.add(deploy_bevo, this);
 		var matt_pow = game.add.button(120, 675, 'powerups', "", this, 1, 1, 1);
 		matt_pow.fixedToCamera = true;
+        matt_pow.onInputDown.add(deploy_matt, this);
 		var horde_pow = game.add.button(190, 675, 'powerups', "", this, 2, 2, 2);
 		horde_pow.fixedToCamera = true;
 		var rain_pow = game.add.button(260, 675, 'powerups', "", this, 3, 3, 3);
@@ -89,6 +94,10 @@ mascot_raid.main_state.prototype = {
         myUnits.setAll('outOfBoundsKill', true);
         
 		myPowers = game.add.group();
+        myPowers.enableBody = true;
+        myPowers.physicalBodyType = Phaser.Physics.ARCADE;
+        myPowers.setAll('checkWorldBounds', true);
+        myPowers.setAll('outOfBoundsKill', true);
 		bevo = game.add.group();
 		matt = game.add.group();
 		horde = game.add.group();
@@ -96,8 +105,6 @@ mascot_raid.main_state.prototype = {
 
 		myPowers.add(bevo, matt, horde, rain);
 
-		// bevo_pow.onInputDown.add(deploy_bevo, this);
-		// matt_pow.onInputDown.add(deploy_matt, this);
 		// horde_pow.onInputDown.add(deploy_horde, this);
 		// rain_pow.onInputDown.add(deploy_rain, this);
 
@@ -113,6 +120,8 @@ mascot_raid.main_state.prototype = {
 		balls = game.add.group();
 		balls.enableBody = true;
 		balls.physicsBodyType = Phaser.Physics.ARCADE;
+        balls.setAll('checkWorldBounds', true);
+        balls.setAll('outOfBoundsKill', true);
 
 		for (var i = 0; i < 30; i++)
 		{
@@ -129,6 +138,9 @@ mascot_raid.main_state.prototype = {
 
 
 		addKeyListen();
+        
+        // add tower self defense
+        var tower = game.add.sprite(210, 85, 'tower');
 
 	},
 
@@ -235,4 +247,35 @@ function sendUnit3 (){
         attack: 80,
     };
     
+}
+
+function tower_fire (){
+    balls.createMultiple(1, 'ball', 0, false);
+    if (game.time.now > tower.fireLastTime) {
+        const balls = balls.getFirstExists(false);
+        if (balls && typeof enemies.children[0] != "undefined") {
+            balls.reset(tower.x, tower.y);
+            balls.body.collideWorldBounds = false;
+            balls.rotation = game.physics.arcade.moveToObject(bullet, enemy.children[0], 300);
+        }
+        tower.fireLastTime = game.time.now + tower.fireTime;
+    }
+}
+
+function tower_def (tower, ene){
+    if (Phaser.Math.distance(this.tower.x, this.tower.y, this.ene.x, this.ene.y) < 650)
+        {
+            this.tower.tower_fire;
+            console.log('firing');
+        }
+}
+
+function deploy_bevo (){
+    console.log('bevo sent');
+    var bevo = myPowers.create(400, game.world.height - 300, 'bevo');
+    bevo.body.velocity.x = 300;
+}
+
+function deploy_matt (){
+    console.log('matt deployed');
 }
