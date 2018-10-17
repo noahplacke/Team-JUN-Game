@@ -1,3 +1,16 @@
+student = function (x, y, health, attack){
+    console.log('student sent');
+    Phaser.Sprite.call(this, game, x, y, 'place_unit', 0);
+    this.enableBody = true;
+    this.physicsBodyType = Phaser.Physics.ARCADE;
+    this.health = health;
+    this.attack = attack;
+    //this.body.velocity.x = 200;
+    game.add.existing(this);
+}
+student.prototype = Object.create(Phaser.Sprite.prototype);
+student.prototype.constructor = student;
+
 var myUnits;
 var bevo;
 var matt;
@@ -9,7 +22,7 @@ var lvl1;
 var lvl2;
 var lvl3;
 var cursors;
-var tower;
+var myTower;
 
 var ballTime = 0;
 var ball;
@@ -58,11 +71,13 @@ mascot_raid.main_state.prototype = {
 
 		//set edge of world
 		game.world.setBounds(0, 0, 2400, 800);
+        
+        //add landmarks
+		var ut_tower = immovable.create(0, 0, 'landmarks', 0);
+        var am_tower = immovable.create(1920, 0, 'landmarks', 1);
 
 		//add in power up buttons
-		buttons = game.add.group();
-		buttons.fixedToCamera = true;
-		var bevo_pow = game.add.button(50, 675, 'powerups', "", this, 0, 0, 0);
+        var bevo_pow = game.add.button(50, 675, 'powerups', "", this, 0, 0, 0);
 		bevo_pow.fixedToCamera = true;
         bevo_pow.onInputDown.add(deploy_bevo, this);
 		var matt_pow = game.add.button(120, 675, 'powerups', "", this, 1, 1, 1);
@@ -70,6 +85,7 @@ mascot_raid.main_state.prototype = {
         matt_pow.onInputDown.add(deploy_matt, this);
 		var horde_pow = game.add.button(190, 675, 'powerups', "", this, 2, 2, 2);
 		horde_pow.fixedToCamera = true;
+        horde_pow.onInputDown.add(deploy_horde, this);
 		var rain_pow = game.add.button(260, 675, 'powerups', "", this, 3, 3, 3);
 		rain_pow.fixedToCamera = true;
 		rain_pow.onInputDown.add(make_it_rain, this);
@@ -77,10 +93,6 @@ mascot_raid.main_state.prototype = {
 		var exit = game.add.button(700, 625, 'button', "", this, 1, 1, 1);
 		exit.fixedToCamera = true;
 		exit.onInputDown.add(exit_pressed, this);
-
-        //add landmarks
-		var ut_tower = immovable.create(0, 0, 'landmarks', 0);
-        var am_tower = immovable.create(1920, 0, 'landmarks', 1);
 
         //add buttons to send units
         var stu_button = game.add.button(400, 675, 'place_buttons', "", this, 0);
@@ -155,6 +167,12 @@ mascot_raid.main_state.prototype = {
 			b.checkWorldBounds = true;
 			b.events.onOutOfBounds.add(resetball, this);
 		}
+        
+        //tower self defense creation
+        var myTower = myUnits.create(210, 85, 'tower');
+        if (Phaser.Math.distance(myTower.x, myTower.y, enemy.children.x, enemy.children.y) < 600)
+            tower_fire()
+        
 
 		cursors = game.input.keyboard.createCursorKeys();
 		game.input.keyboard.addKeyCapture([ Phaser.Keyboard.SPACEBAR ]);
@@ -168,6 +186,7 @@ mascot_raid.main_state.prototype = {
 		game.physics.arcade.overlap(balls, enemy, collisionHandler, null, this);
         game.physics.arcade.overlap(myUnits, enemy, collisionHandler2, null, this);
 		game.physics.arcade.overlap(rain, enemy, collisionHandler3, null, this);
+        game.physics.arcade.overlap(student, enemy, collisionHandler, null, this);
 
 
 
@@ -242,7 +261,7 @@ function make_it_rain() {
 }
 
 function deploy_lvl1 (){
-	console.log("units made");
+	//console.log("units made");
 	var e = enemy.create(2200 + Math.random() * 400, game.world.height - 300 + Math.random() * 10, 'lvl1' , 0);
 	e.frame = 0;
 	e.body.velocity.x = - 200;
@@ -252,7 +271,7 @@ function deploy_lvl1 (){
 }
 
 function deploy_lvl2 (){
-	console.log("units made");
+	//console.log("units made");
 	var e = enemy.create(2200 + Math.random() * 400, game.world.height - 350 + Math.random() * 10, 'lvl2' , 0);
 	e.anchor.setTo(.5,.5);
 	e.scale.x *= -1;
@@ -264,7 +283,7 @@ function deploy_lvl2 (){
 }
 
 function deploy_lvl3 (){
-	console.log("units made");
+	//console.log("units made");
 	var e = enemy.create(2200 + Math.random() * 400, game.world.height - 300 + Math.random() * 10, 'lvl3' , 0);
 	e.anchor.setTo(.5,.5);
 	e.scale.x *= -1;
@@ -276,14 +295,11 @@ function deploy_lvl3 (){
 }
 
 function sendUnit1 (){
-    console.log('student sent');
-    var stu = myUnits.create (400, game.world.height - 300 + Math.random() * 10, 'place_unit', 0);
+    stu = new student(400, game.world.height - 300 + Math.random() * 10, 100, 5);
     stu.body.velocity.x = 200;
-    var stu = {
-        health: 1000,
-        attack: 50,
-    };
-
+    //student.body.velocity.x = 200;
+    //var stu = myUnits.create(400, game.world.height - 300 + Math.random() * 10, 'place_unit', 0);
+    //stu.body.velocity.x = 200;
 }
 
 function sendUnit2 (){
@@ -291,8 +307,8 @@ function sendUnit2 (){
     var fac = myUnits.create (400, game.world.height - 300 + Math.random() * 10, 'place_unit', 1);
     fac.body.velocity.x = 200;
     var fac = {
-        health: 750,
-        attack: 40,
+        health: 75,
+        attack: 5,
     };
 
 }
@@ -302,31 +318,14 @@ function sendUnit3 (){
     var exec = myUnits.create (400, game.world.height - 300 + Math.random() * 10, 'place_unit', 2);
     exec.body.velocity.x = 200;
     var exec = {
-        health: 2000,
-        attack: 80,
+        health: 200,
+        attack: 15,
     };
 
 }
 
 function tower_fire (){
-    balls.createMultiple(1, 'ball', 0, false);
-    if (game.time.now > tower.fireLastTime) {
-        const balls = balls.getFirstExists(false);
-        if (balls && typeof enemies.children[0] != "undefined") {
-            balls.reset(tower.x, tower.y);
-            balls.body.collideWorldBounds = false;
-            balls.rotation = game.physics.arcade.moveToObject(bullet, enemy.children[0], 300);
-        }
-        tower.fireLastTime = game.time.now + tower.fireTime;
-    }
-}
-
-function tower_def (tower, ene){
-    if (Phaser.Math.distance(this.tower.x, this.tower.y, this.ene.x, this.ene.y) < 650)
-        {
-            this.tower.tower_fire;
-            console.log('firing');
-        }
+    console.log('firing');
 }
 
 function deploy_bevo (){
@@ -337,4 +336,8 @@ function deploy_bevo (){
 
 function deploy_matt (){
     console.log('matt deployed');
+}
+
+function deploy_horde (){
+    console.log('horde deployed');
 }
