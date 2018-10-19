@@ -111,8 +111,8 @@ mascot_raid.main_state.prototype = {
         myUnits.physicsBodyType = Phaser.Physics.ARCADE;
         myUnits.setAll('checkWorldBounds', true);
         myUnits.setAll('outOfBoundsKill', true);
-        myUnits.setAll('health', 100);
-        myUnits.setAll('attack', 5);
+        myUnits.setAll('health', 0);
+        myUnits.setAll('attack', 0);
         
         //add in powers
 		myPowers = game.add.group();
@@ -135,24 +135,14 @@ mascot_raid.main_state.prototype = {
 		//  This will check Group vs. Group collision (balls vs. enemy!)
 
 		enemy = game.add.group();
-		lvl1 = game.add.group();
-		lvl1.enableBody = true;
-		lvl1.physicsBodyType = Phaser.Physics.ARCADE;
-		lvl2 = game.add.group();
-		lvl2.enableBody = true;
-		lvl2.physicsBodyType = Phaser.Physics.ARCADE;
-		lvl3 = game.add.group();
-		lvl3.enableBody = true;
-		lvl3.physicsBodyType = Phaser.Physics.ARCADE;
-		enemy.add(lvl1);
-		enemy.add(lvl2);
-		enemy.add(lvl3);
 		enemy.enableBody = true;
 		enemy.physicsBodyType = Phaser.Physics.ARCADE;
+        enemy.setAll('health', 0);
+        enemy.setAll('attack', 0);
 		var unit_timer = (function(){
 			setInterval(deploy_lvl1, 3000);
-			setInterval(deploy_lvl2, 5500);
-			setInterval(deploy_lvl3, 4000);
+			//setInterval(deploy_lvl2, 5500);
+			//setInterval(deploy_lvl3, 4000);
 		})();
 
 		balls = game.add.group();
@@ -189,7 +179,6 @@ mascot_raid.main_state.prototype = {
 		game.physics.arcade.overlap(balls, enemy, collisionHandler, null, this);
         game.physics.arcade.overlap(myUnits, enemy, collisionHandler2, null, this);
 		game.physics.arcade.overlap(rain, enemy, collisionHandler3, null, this);
-        game.physics.arcade.overlap(student, enemy, collisionHandler, null, this);
 
 
 
@@ -243,10 +232,21 @@ function collisionHandler (ball, ene) {
 }
 
 function collisionHandler2 (myUnits, ene) {
-
-    myUnits.kill();
-    ene.kill();
-
+    
+    myUnits.body.velocity.x = 0;
+    ene.body.velocity.x = 0;
+    myUnits.health = myUnits.health - ene.attack;
+    ene.health = ene.health - ene.attack;
+    console.log(myUnits.health);
+    console.log(ene.health);
+    if (myUnits.health <= 0) {
+        myUnits.kill();
+        ene.body.velocity.x = -200;
+    }
+    else if (ene.health <= 0) {
+        ene.kill();
+        myUnits.body.velocity.x = 200;
+    }
 }
 
 function collisionHandler3 (money, ene) {
@@ -266,6 +266,8 @@ function make_it_rain() {
 function deploy_lvl1 (){
 	//console.log("units made");
 	var e = enemy.create(2200 + Math.random() * 400, game.world.height - 300 + Math.random() * 10, 'lvl1' , 0);
+    e.health = 100;
+    e.attack = 5;
 	e.frame = 0;
 	e.body.velocity.x = - 200;
 	e.animations.add('left', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], 16, true);
