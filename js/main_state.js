@@ -1,8 +1,8 @@
 student = function (x, y, health, attack){
     console.log('student sent');
     Phaser.Sprite.call(this, game, x, y, 'place_unit', 0);
-    this.enableBody = true;
-    this.physicsBodyType = Phaser.Physics.ARCADE;
+    enableBody = true;
+    physicsBodyType = Phaser.Physics.ARCADE;
     this.health = health;
     this.attack = attack;
     //this.body.velocity.x = 200;
@@ -111,7 +111,10 @@ mascot_raid.main_state.prototype = {
         myUnits.physicsBodyType = Phaser.Physics.ARCADE;
         myUnits.setAll('checkWorldBounds', true);
         myUnits.setAll('outOfBoundsKill', true);
-
+        myUnits.setAll('health', 100);
+        myUnits.setAll('attack', 5);
+        
+        //add in powers
 		myPowers = game.add.group();
         myPowers.enableBody = true;
         myPowers.physicalBodyType = Phaser.Physics.ARCADE;
@@ -147,9 +150,9 @@ mascot_raid.main_state.prototype = {
 		enemy.enableBody = true;
 		enemy.physicsBodyType = Phaser.Physics.ARCADE;
 		var unit_timer = (function(){
-			setInterval(deploy_lvl1, 250);
-			setInterval(deploy_lvl2, 500);
-			setInterval(deploy_lvl3, 1000);
+			setInterval(deploy_lvl1, 3000);
+			setInterval(deploy_lvl2, 5500);
+			setInterval(deploy_lvl3, 4000);
 		})();
 
 		balls = game.add.group();
@@ -272,7 +275,7 @@ function deploy_lvl1 (){
 
 function deploy_lvl2 (){
 	//console.log("units made");
-	var e = enemy.create(2200 + Math.random() * 400, game.world.height - 350 + Math.random() * 10, 'lvl2' , 0);
+	var e = enemy.create(2200 + Math.random() * 400, game.world.height - 325 + Math.random() * 10, 'lvl2' , 0);
 	e.anchor.setTo(.5,.5);
 	e.scale.x *= -1;
 	e.frame = 0;
@@ -295,33 +298,29 @@ function deploy_lvl3 (){
 }
 
 function sendUnit1 (){
-    stu = new student(400, game.world.height - 300 + Math.random() * 10, 100, 5);
+    var stu = myUnits.create(400, game.world.height - 325 + Math.random() * 30, 'place_unit', 0);
+    stu.health = 100;
+    stu.attack = 5;
     stu.body.velocity.x = 200;
-    //student.body.velocity.x = 200;
-    //var stu = myUnits.create(400, game.world.height - 300 + Math.random() * 10, 'place_unit', 0);
-    //stu.body.velocity.x = 200;
+    console.log(stu.health);
+    console.log(stu.attack);
 }
 
 function sendUnit2 (){
     console.log('faculty sent');
-    var fac = myUnits.create (400, game.world.height - 300 + Math.random() * 10, 'place_unit', 1);
+    var fac = myUnits.create (400, game.world.height - 325 + Math.random() * 30, 'place_unit', 1);
     fac.body.velocity.x = 200;
-    var fac = {
-        health: 75,
-        attack: 5,
-    };
+    fac.health = 75;
+    fac.attack = 5;
 
 }
 
 function sendUnit3 (){
     console.log('exec sent');
-    var exec = myUnits.create (400, game.world.height - 300 + Math.random() * 10, 'place_unit', 2);
+    var exec = myUnits.create (400, game.world.height - 325 + Math.random() * 30, 'place_unit', 2);
     exec.body.velocity.x = 200;
-    var exec = {
-        health: 200,
-        attack: 15,
-    };
-
+    exec.health = 300;
+    exec.attack = 15;
 }
 
 function tower_fire (){
