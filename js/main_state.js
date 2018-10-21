@@ -63,18 +63,20 @@ mascot_raid.main_state.prototype = {
 		var BG = game.add.sprite(0, 0, 'background');
 
 		//physics for immovable objects
-		immovable = game.add.group();
-		immovable.enableBody = true;
-        immovable.physicsBodyType = Phaser.Physics.ARCADE;
-		var floor = immovable.create(0, 0, 'ground');
-		floor.body.immovable = true;
+		bases = game.add.group();
+		bases.enableBody = true;
+        bases.physicsBodyType = Phaser.Physics.ARCADE;
+        bases.setAll('health', 3000);
+		var floor = game.add.sprite(0, 0, 'ground');
 
 		//set edge of world
 		game.world.setBounds(0, 0, 2400, 800);
         
         //add landmarks
-		var ut_tower = immovable.create(0, 0, 'landmarks', 0);
-        var am_tower = immovable.create(1920, 0, 'landmarks', 1);
+		var ut_tower = bases.create(0, 0, 'landmarks', 0);
+        ut_tower.health = 3000;
+        var am_tower = bases.create(1920, 0, 'landmarks', 1);
+        am_tower.health = 3000;
 
 		//add in power up buttons
         var bevo_pow = game.add.button(50, 675, 'powerups', "", this, 0, 0, 0);
@@ -140,9 +142,9 @@ mascot_raid.main_state.prototype = {
         enemy.setAll('health', 0);
         enemy.setAll('attack', 0);
 		var unit_timer = (function(){
-			setInterval(deploy_lvl1, 3000);
-			//setInterval(deploy_lvl2, 5500);
-			//setInterval(deploy_lvl3, 4000);
+			setInterval(deploy_lvl1, 6000);
+			setInterval(deploy_lvl2, 10000);
+			setInterval(deploy_lvl3, 8000);
 		})();
 
 		balls = game.add.group();
@@ -177,8 +179,10 @@ mascot_raid.main_state.prototype = {
 
 	update: function() {
 		game.physics.arcade.overlap(balls, enemy, collisionHandler, null, this);
-        game.physics.arcade.overlap(myUnits, enemy, collisionHandler2, null, this);
+        setTimeout(game.physics.arcade.overlap(myUnits, enemy, collisionHandler2, null, this), 1000);
 		game.physics.arcade.overlap(rain, enemy, collisionHandler3, null, this);
+        //game.physics.arcade.overlap(myUnits, bases, collisionHandler4, null, this);
+        //game.physics.arcade.overlap(enemy, bases, collisionHandler4, null, this);
 
 
 
@@ -235,8 +239,12 @@ function collisionHandler2 (myUnits, ene) {
     
     myUnits.body.velocity.x = 0;
     ene.body.velocity.x = 0;
-    myUnits.health = myUnits.health - ene.attack;
-    ene.health = ene.health - ene.attack;
+    var timeDelay = 0;
+    if (game.time.now > timeDelay) {
+        myUnits.health = myUnits.health - ene.attack;
+        ene.health = ene.health - ene.attack;
+        timeDelay = game.time.now + 1000;
+    }
     console.log(myUnits.health);
     console.log(ene.health);
     if (myUnits.health <= 0) {
@@ -255,6 +263,17 @@ function collisionHandler3 (money, ene) {
 
 }
 
+function collisionHandler4 (unit, base) {
+
+    unit.body.velocity.x = 0;
+    base.health = base.health - unit.attack;
+    console.log(base.health);
+    if (base.health < 0) {
+        base.kill();
+    }
+
+}
+
 function make_it_rain() {
 	for (i = 0; i < 50; i++){
 		var e = rain.create(Math.random() * game.world.width, 0, 'money', 0);
@@ -266,7 +285,7 @@ function make_it_rain() {
 function deploy_lvl1 (){
 	//console.log("units made");
 	var e = enemy.create(2200 + Math.random() * 400, game.world.height - 300 + Math.random() * 10, 'lvl1' , 0);
-    e.health = 100;
+    e.health = 500;
     e.attack = 5;
 	e.frame = 0;
 	e.body.velocity.x = - 200;
@@ -278,6 +297,8 @@ function deploy_lvl1 (){
 function deploy_lvl2 (){
 	//console.log("units made");
 	var e = enemy.create(2200 + Math.random() * 400, game.world.height - 325 + Math.random() * 10, 'lvl2' , 0);
+    e.health = 1000;
+    e.attack = 15;
 	e.anchor.setTo(.5,.5);
 	e.scale.x *= -1;
 	e.frame = 0;
@@ -290,6 +311,8 @@ function deploy_lvl2 (){
 function deploy_lvl3 (){
 	//console.log("units made");
 	var e = enemy.create(2200 + Math.random() * 400, game.world.height - 300 + Math.random() * 10, 'lvl3' , 0);
+    e.health = 500;
+    e.attack = 10;
 	e.anchor.setTo(.5,.5);
 	e.scale.x *= -1;
 	e.frame = 0;
@@ -299,30 +322,39 @@ function deploy_lvl3 (){
 
 }
 
-function sendUnit1 (){
-    var stu = myUnits.create(400, game.world.height - 325 + Math.random() * 30, 'place_unit', 0);
-    stu.health = 100;
-    stu.attack = 5;
-    stu.body.velocity.x = 200;
-    console.log(stu.health);
-    console.log(stu.attack);
+function buttonReset (button) {
+    button.inputEnabled = true;
 }
 
-function sendUnit2 (){
+function sendUnit1 (stu_button){
+    console.log('student sent');
+    var stu = myUnits.create(400, game.world.height - 325 + Math.random() * 30, 'place_unit', 0);
+    stu_button.inputEnabled = false;
+    game.time.events.add(3000, buttonReset, this, stu_button);
+    stu.health = 500;
+    stu.attack = 5;
+    stu.body.velocity.x = 200;
+}
+
+function sendUnit2 (fac_button){
     console.log('faculty sent');
     var fac = myUnits.create (400, game.world.height - 325 + Math.random() * 30, 'place_unit', 1);
+    fac_button.inputEnabled = false;
+    game.time.events.add(3000, buttonReset, this, fac_button);
     fac.body.velocity.x = 200;
-    fac.health = 75;
+    fac.health = 400;
     fac.attack = 5;
 
 }
 
-function sendUnit3 (){
+function sendUnit3 (exec_button){
     console.log('exec sent');
     var exec = myUnits.create (400, game.world.height - 325 + Math.random() * 30, 'place_unit', 2);
+    exec_button.inputEnabled = false;
+    game.time.events.add(6000, buttonReset, this, exec_button);
     exec.body.velocity.x = 200;
-    exec.health = 300;
-    exec.attack = 15;
+    exec.health = 1000;
+    exec.attack = 20;
 }
 
 function tower_fire (){
