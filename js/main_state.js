@@ -11,8 +11,12 @@ student = function(x, y, health, attack) {
 student.prototype = Object.create(Phaser.Sprite.prototype);
 student.prototype.constructor = student;
 
+var ut_health;
+var am_health;
+var ut_tower;
+var am_tower;
 var myUnits;
-var bevo;
+var truck;
 var matt;
 var horde;
 var rain;
@@ -23,6 +27,7 @@ var lvl2;
 var lvl3;
 var cursors;
 var myTower;
+var ram_count = 20;
 
 var ballTime = 0;
 var ball;
@@ -48,7 +53,7 @@ mascot_raid.main_state.prototype = {
         game.load.spritesheet('place_unit', 'assets/placehold_unit.png', 64, 64, 3);
         game.load.image('bevo', 'assets/bevo.png');
         game.load.image('tower', 'assets/tower.png');
-        game.load.image('truck_body', 'assets/truck/body.png');
+        game.load.image('truck_body', 'assets/truck/full.png');
         game.load.image('truck_wheel', 'assets/truck/wheel.png');
         console.log("In game");
 
@@ -75,15 +80,21 @@ mascot_raid.main_state.prototype = {
         game.world.setBounds(0, 0, 2400, 800);
 
         //add landmarks
-        var ut_tower = bases.create(0, 0, 'landmarks', 0);
-        ut_tower.health = 3000;
-        var am_tower = bases.create(1920, 0, 'landmarks', 1);
-        am_tower.health = 3000;
+        ut_tower = bases.create(0, 0, 'landmarks', 0);
+        ut_tower.health = 50000;
+        am_tower = bases.create(1920, 0, 'landmarks', 1);
+        am_tower.health = 50000;
+
+        ut_health = game.add.text(50, 50, ut_tower.health, { fontSize: '42px', fill: 'black' });
+        ut_health.fixedToCamera = true;
+        am_health = game.add.text(1250, 50, am_tower.health, { fontSize: '42px', fill: 'black' });
+        am_health.fixedToCamera = true;
+
 
         //add in power up buttons
-        var bevo_pow = game.add.button(50, 675, 'powerups', "", this, 0, 0, 0);
-        bevo_pow.fixedToCamera = true;
-        bevo_pow.onInputDown.add(deploy_bevo, this);
+        // var bevo_pow = game.add.button(50, 675, 'powerups', "", this, 0, 0, 0);
+        // bevo_pow.fixedToCamera = true;
+        // bevo_pow.onInputDown.add(deploy_bevo, this);
         var matt_pow = game.add.button(120, 675, 'powerups', "", this, 1, 1, 1);
         matt_pow.fixedToCamera = true;
         matt_pow.onInputDown.add(deploy_matt, this);
@@ -93,6 +104,9 @@ mascot_raid.main_state.prototype = {
         var rain_pow = game.add.button(260, 675, 'powerups', "", this, 3, 3, 3);
         rain_pow.fixedToCamera = true;
         rain_pow.onInputDown.add(make_it_rain, this);
+        var truck_pow = game.add.button(50, 675, 'powerups', "", this, 0, 0, 0);
+        truck_pow.fixedToCamera = true;
+        truck_pow.onInputDown.add(deploy_truck, this);
 
         var exit = game.add.button(700, 625, 'button', "", this, 1, 1, 1);
         exit.fixedToCamera = true;
@@ -124,14 +138,16 @@ mascot_raid.main_state.prototype = {
         myPowers.physicalBodyType = Phaser.Physics.ARCADE;
         myPowers.setAll('checkWorldBounds', true);
         myPowers.setAll('outOfBoundsKill', true);
-        bevo = game.add.group();
+        truck = game.add.group();
+        truck.enableBody = true;
+        truck.physicsBodyType = Phaser.Physics.ARCADE;
         matt = game.add.group();
         horde = game.add.group();
         rain = game.add.group();
         rain.enableBody = true;
         rain.physicsBodyType = Phaser.Physics.ARCADE;
 
-        myPowers.add(bevo, matt, horde, rain);
+        myPowers.add(truck, matt, horde, rain);
 
         // horde_pow.onInputDown.add(deploy_horde, this);
         // rain_pow.onInputDown.add(deploy_rain, this);
@@ -144,9 +160,9 @@ mascot_raid.main_state.prototype = {
         enemy.setAll('health', 0);
         enemy.setAll('attack', 0);
         var unit_timer = (function() {
-            setInterval(deploy_lvl1, 6000);
-            setInterval(deploy_lvl2, 10000);
-            setInterval(deploy_lvl3, 8000);
+            setInterval(deploy_lvl1, 1000);
+            setInterval(deploy_lvl2, 3000);
+            setInterval(deploy_lvl3, 6000);
         })();
 
         balls = game.add.group();
@@ -182,6 +198,9 @@ mascot_raid.main_state.prototype = {
         game.physics.arcade.overlap(balls, enemy, collisionHandler, null, this);
         setTimeout(game.physics.arcade.overlap(myUnits, enemy, collisionHandler2, null, this), 1000);
         game.physics.arcade.overlap(rain, enemy, collisionHandler3, null, this);
+        game.physics.arcade.overlap(truck, enemy, truckCollisionHandler, null, this);
+        game.physics.arcade.overlap(ut_tower, enemy, utCollisionHandler, null, this);
+        game.physics.arcade.overlap(am_tower, myUnits, amCollisionHandler, null, this);
         //game.physics.arcade.overlap(myUnits, bases, collisionHandler4, null, this);
         //game.physics.arcade.overlap(enemy, bases, collisionHandler4, null, this);
 
@@ -259,12 +278,47 @@ function collisionHandler3(money, ene) {
     ene.kill();
 
 }
+function truckCollisionHandler(truck, ene){
+    if(ram_count > 0){
+        ene.kill();
+        ram_count--;
+    } else {
+        truck.kill();
+        ram_count = 20;
+    }
+}
+function utCollisionHandler(base, units){
+    units.body.velocity.x = 0;
+    var timeDelay = 0;
+    if (game.time.now > timeDelay) {
+        base.health -= units.attack;
+        timeDelay = game.time.now + 1000;
+    }
+    ut_health.text = base.health;
+    if (base.health <= 0) {
+        var over = game.add.text(game.world.centerX/2, game.world.centerY/2, "Game Over", { fontSize: '72px', fill: 'black' });
+        over.fixedToCamera = true;
+    }
+}
+
+function amCollisionHandler(base, units){
+    units.body.velocity.x = 0;
+    var timeDelay = 0;
+    if (game.time.now > timeDelay) {
+        base.health -= units.attack;
+        timeDelay = game.time.now + 1000;
+    }
+    am_health.text = base.health;
+    if (base.health <= 0) {
+        var over = game.add.text(game.world.centerX/2, game.world.centerY/2, "You Win!", { fontSize: '72px', fill: 'black' });
+        over.fixedToCamera = true;
+    }
+}
 
 function collisionHandler4(unit, base) {
 
     unit.body.velocity.x = 0;
     base.health = base.health - unit.attack;
-    console.log(base.health);
     if (base.health < 0) {
         base.kill();
     }
@@ -272,6 +326,7 @@ function collisionHandler4(unit, base) {
 }
 
 function make_it_rain() {
+    console.log("making it rain!");
     for (i = 0; i < 50; i++) {
         var e = rain.create(Math.random() * game.world.width, 0, 'money', 0);
         e.frame = 0;
@@ -308,8 +363,8 @@ function deploy_lvl2() {
 function deploy_lvl3() {
     //console.log("units made");
     var e = enemy.create(2200 + Math.random() * 400, game.world.height - 300 + Math.random() * 10, 'lvl3', 0);
-    e.health = 500;
-    e.attack = 10;
+    e.health = 1500;
+    e.attack = 50;
     e.anchor.setTo(.5, .5);
     e.scale.x *= -1;
     e.frame = 0;
@@ -346,7 +401,7 @@ function sendUnit2(fac_button) {
 
 function sendUnit3(exec_button) {
     console.log('exec sent');
-    var exec = myUnits.create(400, game.world.height - 325 + Math.random() * 30, 'truck_body');
+    var exec = myUnits.create(400, game.world.height - 325 + Math.random() * 30, 'place_unit', 2);
     exec_button.inputEnabled = false;
     game.time.events.add(6000, buttonReset, this, exec_button);
     exec.body.velocity.x = 200;
@@ -358,10 +413,10 @@ function tower_fire() {
     console.log('firing');
 }
 
-function deploy_bevo() {
-    console.log('bevo sent');
-    var bevo = myPowers.create(400, game.world.height - 300, 'bevo');
-    bevo.body.velocity.x = 300;
+function deploy_truck() {
+    console.log('truck sent');
+    var e = truck.create(0, game.world.height - 500, 'truck_body');
+    e.body.velocity.x = 500;
 }
 
 function deploy_matt() {
