@@ -12,15 +12,15 @@ function addKeyListen() {
 }
 
 function in_game() {
-    change_game_scene_0();
+    game.state.start('main_state');
 }
 
 function in_credits() {
-    change_credits();
+    game.state.start('credits');
 }
 
 function exit_pressed() {
-    change_main_menu();
+    game.state.start('main_menu');
 }
 
 function restart() {
@@ -28,17 +28,17 @@ function restart() {
     game.state.start('main_menu');
 }
 
-function change_main_menu() {
-    game.state.start('main_menu');
-}
+// function change_main_menu() {
+//     game.state.start('main_menu');
+// }
 
-function change_game_scene_0() {
-    game.state.start('main_state');
-}
+// function change_game_scene_0() {
+//     game.state.start('main_state');
+// }
 
-function change_credits() {
-    game.state.start('credits');
-}
+// function change_credits() {
+//     game.state.start('credits');
+// }
 
 function deploy_bevo(){
     // bevo.
