@@ -1,16 +1,3 @@
-student = function(x, y, health, attack) {
-    console.log('student sent');
-    Phaser.Sprite.call(this, game, x, y, 'place_unit', 0);
-    enableBody = true;
-    physicsBodyType = Phaser.Physics.ARCADE;
-    this.health = health;
-    this.attack = attack;
-    //this.body.velocity.x = 200;
-    game.add.existing(this);
-}
-student.prototype = Object.create(Phaser.Sprite.prototype);
-student.prototype.constructor = student;
-
 var ut_health;
 var am_health;
 var ut_tower;
@@ -55,6 +42,8 @@ mascot_raid.main_state.prototype = {
         game.load.image('tower', 'assets/tower.png');
         game.load.image('truck_body', 'assets/truck/full.png');
         game.load.image('truck_wheel', 'assets/truck/wheel.png');
+        game.load.spritesheet('matt', 'assets/matt_sprites.png', 165, 57, 49);
+        game.load.spritesheet('horde', 'assets/horde.png', 15, 32, 8);
         console.log("In game");
 
     },
@@ -142,7 +131,11 @@ mascot_raid.main_state.prototype = {
         truck.enableBody = true;
         truck.physicsBodyType = Phaser.Physics.ARCADE;
         matt = game.add.group();
+        matt.enableBody = true;
+        matt.physicsBodyType = Phaser.Physics.ARCADE;
         horde = game.add.group();
+        horde.enableBody = true;
+        horde.physicsBodyType = Phaser.Physics.ARCADE;
         rain = game.add.group();
         rain.enableBody = true;
         rain.physicsBodyType = Phaser.Physics.ARCADE;
@@ -160,7 +153,7 @@ mascot_raid.main_state.prototype = {
         enemy.setAll('health', 0);
         enemy.setAll('attack', 0);
         var unit_timer = (function() {
-            setInterval(deploy_lvl1, 1000);
+            setInterval(deploy_lvl1, 2000);
             setInterval(deploy_lvl2, 3000);
             setInterval(deploy_lvl3, 6000);
         })();
@@ -196,13 +189,13 @@ mascot_raid.main_state.prototype = {
 
     update: function() {
         game.physics.arcade.overlap(balls, enemy, collisionHandler, null, this);
-        setTimeout(game.physics.arcade.overlap(myUnits, enemy, collisionHandler2, null, this), 1000);
+        setInterval(game.physics.arcade.overlap(myUnits, enemy, collisionHandler2, null, this), 1000);
         game.physics.arcade.overlap(rain, enemy, collisionHandler3, null, this);
         game.physics.arcade.overlap(truck, enemy, truckCollisionHandler, null, this);
         game.physics.arcade.overlap(ut_tower, enemy, utCollisionHandler, null, this);
         game.physics.arcade.overlap(am_tower, myUnits, amCollisionHandler, null, this);
-        //game.physics.arcade.overlap(myUnits, bases, collisionHandler4, null, this);
-        //game.physics.arcade.overlap(enemy, bases, collisionHandler4, null, this);
+        game.physics.arcade.overlap(matt, enemy, collisionHandler2, null, this);
+        game.physics.arcade.overlap(horde, enemy, collisionHandler, null, this);
 
 
 
@@ -262,8 +255,8 @@ function collisionHandler2(myUnits, ene) {
         ene.health = ene.health - ene.attack;
         timeDelay = game.time.now + 1000;
     }
-    console.log(myUnits.health);
-    console.log(ene.health);
+    //console.log(myUnits.health);
+    //console.log(ene.health);
     if (myUnits.health <= 0) {
         myUnits.kill();
         ene.body.velocity.x = -200;
@@ -323,15 +316,6 @@ function collisionHandler4(unit, base) {
         base.kill();
     }
 
-}
-
-function make_it_rain() {
-    console.log("making it rain!");
-    for (i = 0; i < 50; i++) {
-        var e = rain.create(Math.random() * game.world.width, 0, 'money', 0);
-        e.frame = 0;
-        e.body.velocity.y = 200;
-    }
 }
 
 function deploy_lvl1() {
@@ -413,16 +397,57 @@ function tower_fire() {
     console.log('firing');
 }
 
-function deploy_truck() {
+function deploy_truck(truck_pow) {
     console.log('truck sent');
     var e = truck.create(0, game.world.height - 500, 'truck_body');
+    truck_pow.inputEnabled = false;
+    game.time.events.add(10000, buttonReset, this, truck_pow);
     e.body.velocity.x = 500;
 }
 
-function deploy_matt() {
+function deploy_matt(matt_pow) {
     console.log('matt deployed');
+    var m = matt.create(425, game.world.height - 395, 'matt', 2);
+    matt_pow.inputEnabled = false;
+    game.time.events.add(10000, buttonReset, this, matt_pow);
+    m.scale.setTo(2.5, 2.5);
+    m.health = 10000;
+    m.attack = 150;
+    m.animations.add('attack', [2, 6, 7, 8, 9, 10, 11], 7, true);
+    m.animations.play('attack');
 }
 
-function deploy_horde() {
-    console.log('horde deployed');
+var horde_num = 0;
+function horde_send() {
+    setTimeout(function() {
+        var h = horde.create(400, game.world.height - 325 + Math.random() * 30, 'horde', 4);
+        h.scale.x *= -1;
+        h.body.velocity.x = 250;
+        h.animations.add('run', [4, 3, 2], 3, true);
+        h.animations.play('run');
+        horde_num++;
+        if (horde_num < 20) {
+            horde_send();
+        }
+        if (horde_num >= 20) {
+            horde_num = 0;
+        }
+    }, 100);
+}
+function deploy_horde(horde_pow) {
+    horde_pow.inputEnabled = false;
+    game.time.events.add(10000, buttonReset, this, horde_pow);
+    horde_send()
+    
+}
+
+function make_it_rain(rain_pow) {
+    console.log("making it rain!");
+    rain_pow.inputEnabled = false;
+    game.time.events.add(10000, buttonReset, this, rain_pow);
+    for (i = 0; i < 50; i++) {
+        var e = rain.create(Math.random() * game.world.width, 0, 'money', 0);
+        e.frame = 0;
+        e.body.velocity.y = 200;
+    }
 }
