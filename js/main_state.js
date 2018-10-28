@@ -38,6 +38,9 @@ mascot_raid.main_state.prototype = {
         game.load.spritesheet('landmarks', 'assets/landmarks.png', 480, 600, 2);
         game.load.spritesheet('place_buttons', 'assets/placehold_buttons.png', 64, 64, 3);
         game.load.spritesheet('place_unit', 'assets/placehold_unit.png', 64, 64, 3);
+        game.load.spritesheet('student', 'assets/student.png', 108, 140, 8);
+        game.load.spritesheet('faculty', 'assets/faculty.png', 175, 245, 8);
+        game.load.spritesheet('football_player', 'assets/football_player.png', 37.75, 60, 8);
         game.load.image('bevo', 'assets/bevo.png');
         game.load.image('tower', 'assets/tower.png');
         game.load.image('truck_body', 'assets/truck/full.png');
@@ -141,9 +144,9 @@ mascot_raid.main_state.prototype = {
         rain.physicsBodyType = Phaser.Physics.ARCADE;
 
         myPowers.add(truck, matt, horde, rain);
-
-        // horde_pow.onInputDown.add(deploy_horde, this);
-        // rain_pow.onInputDown.add(deploy_rain, this);
+        
+        //add in timer
+        timer = game.time.create(false);
 
         //  This will check Group vs. Group collision (balls vs. enemy!)
 
@@ -214,6 +217,10 @@ mascot_raid.main_state.prototype = {
             throwball();
         }
 
+    },
+    
+    render: function() {
+        game.debug.text('Cooldown time remaining: ' + timer.duration.toFixed(0), 200, 755, '#0000');
     }
 }
 
@@ -362,35 +369,59 @@ function buttonReset(button) {
     button.inputEnabled = true;
 }
 
+function restoreButton(cover) {
+    console.log('cooldown done');
+    //cover.kill();
+}
+
+function cooldown(x, y, time) {
+    timer.add(time, restoreButton, this);
+    timer.start();
+    //game.debug.text(timer.duration.toFixed(0), x, y, '#0000');
+}
+
 function sendUnit1(stu_button) {
     console.log('student sent');
-    var stu = myUnits.create(400, game.world.height - 325 + Math.random() * 30, 'place_unit', 0);
+    var stu = myUnits.create(400, game.world.height - 335 + Math.random() * 30, 'student', 0);
     stu_button.inputEnabled = false;
     game.time.events.add(3000, buttonReset, this, stu_button);
+    stu.scale.setTo(.5, .5);
     stu.health = 500;
     stu.attack = 5;
     stu.body.velocity.x = 200;
+    //timer.add(3000, restoreButton, this);
+    //timer.start();
+    //game.debug.text(timer.duration.toFixed(0), 410, 755, '#0000');
+    cooldown(410, 755, 3000);
+    stu.animations.add('run', [0, 1, 2, 3, 4, 5, 6, 7], 8, true);
+    stu.animations.play('run');
 }
 
 function sendUnit2(fac_button) {
     console.log('faculty sent');
-    var fac = myUnits.create(400, game.world.height - 325 + Math.random() * 30, 'place_unit', 1);
+    var fac = myUnits.create(400, game.world.height - 375 + Math.random() * 30, 'faculty', 0);
     fac_button.inputEnabled = false;
     game.time.events.add(3000, buttonReset, this, fac_button);
+    fac.scale.setTo(.4, .4);
     fac.body.velocity.x = 200;
     fac.health = 400;
     fac.attack = 5;
+    fac.animations.add('run', [0, 1, 2, 3, 4, 5, 6, 7], 8, true);
+    fac.animations.play('run');
 
 }
 
 function sendUnit3(exec_button) {
     console.log('exec sent');
-    var exec = myUnits.create(400, game.world.height - 325 + Math.random() * 30, 'place_unit', 2);
+    var exec = myUnits.create(400, game.world.height - 375 + Math.random() * 30, 'football_player', 4);
     exec_button.inputEnabled = false;
     game.time.events.add(6000, buttonReset, this, exec_button);
     exec.body.velocity.x = 200;
+    exec.scale.setTo(2, 2);
     exec.health = 1000;
     exec.attack = 20;
+    exec.animations.add('run', [3, 4, 5, 6, 7], 5, true);
+    exec.animations.play('run');
 }
 
 function tower_fire() {
