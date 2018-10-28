@@ -377,6 +377,16 @@ function restoreButton(cover) {
 function cooldown(x, y, time) {
     timer.add(time, restoreButton, this);
     timer.start();
+    /*timeInSeconds = time / 1000;
+    timeString = timeInSeconds.toString();
+    timeText = game.add.text(x, y, timeString, '#0000');
+    while (i = 0, i < time, i++) {
+        if (time % 1000 = 0) {
+            timeInSeconds -= 1;
+            timeString = timeInSeconds.toString();
+            timeText = game.add.text(x, y, timeString, '#0000');
+        }
+    }*/
     //game.debug.text(timer.duration.toFixed(0), x, y, '#0000');
 }
 
