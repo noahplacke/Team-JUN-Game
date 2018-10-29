@@ -220,7 +220,7 @@ mascot_raid.main_state.prototype = {
     },
     
     render: function() {
-        game.debug.text('Cooldown time remaining: ' + timer.duration.toFixed(0), 200, 755, '#0000');
+        //game.debug.text('Cooldown time remaining: ' + timer.duration.toFixed(0), 200, 755, '#0000');
     }
 }
 
@@ -375,19 +375,25 @@ function restoreButton(cover) {
 }
 
 function cooldown(x, y, time) {
-    timer.add(time, restoreButton, this);
-    timer.start();
-    /*timeInSeconds = time / 1000;
-    timeString = timeInSeconds.toString();
-    timeText = game.add.text(x, y, timeString, '#0000');
-    while (i = 0, i < time, i++) {
-        if (time % 1000 = 0) {
-            timeInSeconds -= 1;
-            timeString = timeInSeconds.toString();
-            timeText = game.add.text(x, y, timeString, '#0000');
-        }
-    }*/
+    //timer.add(time, restoreButton, this);
+    //timer.start();
+    timeInSeconds = time / 1000;
+    timeText = game.add.text(x + 15, y - 20, timeInSeconds);
+    timer = game.time.events.loop(Phaser.Timer.SECOND, updateTimer, this, timeInSeconds, timeText);
+    //timeString = timeInSeconds.toString();
+    //timeText = game.add.text(x + 15, y - 20, timeString);
     //game.debug.text(timer.duration.toFixed(0), x, y, '#0000');
+}
+
+function updateTimer(timeInSeconds, timeText) {
+    this.timeInSeconds--;
+    timeText.text = this.timeInSeconds;
+    console.log(this.timeInSeconds);
+    if (this.timeInSeconds == 0) {
+        game.world.remove(timeText);
+        game.time.events.stop();
+        console.log('cooldown done');
+    }
 }
 
 function sendUnit1(stu_button) {
@@ -416,6 +422,7 @@ function sendUnit2(fac_button) {
     fac.body.velocity.x = 200;
     fac.health = 400;
     fac.attack = 5;
+    cooldown(480, 755, 3000);
     fac.animations.add('run', [0, 1, 2, 3, 4, 5, 6, 7], 8, true);
     fac.animations.play('run');
 
@@ -430,6 +437,7 @@ function sendUnit3(exec_button) {
     exec.scale.setTo(2, 2);
     exec.health = 1000;
     exec.attack = 20;
+    cooldown(550, 755, 3000);
     exec.animations.add('run', [3, 4, 5, 6, 7], 5, true);
     exec.animations.play('run');
 }
