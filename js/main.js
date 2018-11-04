@@ -20,7 +20,7 @@ function in_credits() {
 }
 
 function exit_pressed() {
-    game.state.start('main_menu');
+    game.state.start('main_menu', true, false);
 }
 
 function restart() {

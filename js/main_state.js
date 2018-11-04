@@ -27,7 +27,7 @@ mascot_raid.main_state.prototype = {
         game.load.image('background', 'assets/level_background.png');
         game.load.image('ground', 'assets/ground.png');
         game.load.spritesheet('tree', 'assets/trees.png');
-        game.load.spritesheet('powerups', 'assets/powerup_buttons.png', 64, 64, 4);
+        game.load.spritesheet('powerups', 'assets/powerup_buttons.png', 64, 64, 5);
         game.load.spritesheet('button', 'assets/button_sprite_sheet.png', 100, 100, 4);
         game.load.audio('sprint1_music', 'assets/sprint1_music.mp3')
         game.load.image('ball', 'assets/ball.png');
@@ -36,7 +36,7 @@ mascot_raid.main_state.prototype = {
         game.load.spritesheet('lvl2', 'assets/lvl2.png', 50.5, 100);
         game.load.spritesheet('lvl3', 'assets/lvl3.png', 24.5, 32);
         game.load.spritesheet('landmarks', 'assets/landmarks.png', 480, 600, 2);
-        game.load.spritesheet('place_buttons', 'assets/placehold_buttons.png', 64, 64, 3);
+        game.load.spritesheet('place_buttons', 'assets/placehold_buttons.png', 64, 64, 4);
         game.load.spritesheet('place_unit', 'assets/placehold_unit.png', 64, 64, 3);
         game.load.spritesheet('student', 'assets/student.png', 108, 140, 8);
         game.load.spritesheet('faculty', 'assets/faculty.png', 175, 245, 8);
@@ -47,6 +47,7 @@ mascot_raid.main_state.prototype = {
         game.load.image('truck_wheel', 'assets/truck/wheel.png');
         game.load.spritesheet('matt', 'assets/matt_sprites.png', 165, 57, 49);
         game.load.spritesheet('horde', 'assets/horde.png', 15, 32, 8);
+        game.load.image('cover', 'assets/cover.png');
         console.log("In game");
 
     },
@@ -217,10 +218,6 @@ mascot_raid.main_state.prototype = {
             throwball();
         }
 
-    },
-    
-    render: function() {
-        //game.debug.text('Cooldown time remaining: ' + timer.duration.toFixed(0), 200, 755, '#0000');
     }
 }
 
@@ -256,6 +253,7 @@ function collisionHandler2(myUnits, ene) {
 
     myUnits.body.velocity.x = 0;
     ene.body.velocity.x = 0;
+    myUnits.text.setText(myUnits.health);
     var timeDelay = 0;
     if (game.time.now > timeDelay) {
         myUnits.health = myUnits.health - ene.attack;
@@ -298,6 +296,8 @@ function utCollisionHandler(base, units){
     if (base.health <= 0) {
         var over = game.add.text(game.world.centerX/2, game.world.centerY/2, "Game Over", { fontSize: '72px', fill: 'black' });
         over.fixedToCamera = true;
+        game.paused = true;
+        ut_health.text = 0;
     }
 }
 
@@ -312,6 +312,8 @@ function amCollisionHandler(base, units){
     if (base.health <= 0) {
         var over = game.add.text(game.world.centerX/2, game.world.centerY/2, "You Win!", { fontSize: '72px', fill: 'black' });
         over.fixedToCamera = true;
+        game.paused = true;
+        am_health.text = 0;
     }
 }
 
@@ -369,29 +371,22 @@ function buttonReset(button) {
     button.inputEnabled = true;
 }
 
-function restoreButton(cover) {
-    console.log('cooldown done');
-    //cover.kill();
-}
-
 function cooldown(x, y, time) {
-    //timer.add(time, restoreButton, this);
-    //timer.start();
-    timeInSeconds = time / 1000;
-    timeText = game.add.text(x + 15, y - 20, timeInSeconds);
-    timer = game.time.events.loop(Phaser.Timer.SECOND, updateTimer, this, timeInSeconds, timeText);
-    //timeString = timeInSeconds.toString();
-    //timeText = game.add.text(x + 15, y - 20, timeString);
-    //game.debug.text(timer.duration.toFixed(0), x, y, '#0000');
+    //timeInSeconds = time / 1000;
+    //timeText = game.add.text(x + 15, y - 20, timeInSeconds);
+    //timer = game.time.events.loop(Phaser.Timer.SECOND, updateTimer, this, timeInSeconds, timeText, timer);
+    cover = game.add.sprite(x - 10, y - 80, 'cover');
+    game.time.events.add(time, function(){cover.kill()}, cover);
 }
 
-function updateTimer(timeInSeconds, timeText) {
+function updateTimer(timeInSeconds, timeText, timer) {
     this.timeInSeconds--;
     timeText.text = this.timeInSeconds;
     console.log(this.timeInSeconds);
     if (this.timeInSeconds == 0) {
         game.world.remove(timeText);
         game.time.events.stop();
+        game.world.remove(timer)
         console.log('cooldown done');
     }
 }
@@ -399,16 +394,21 @@ function updateTimer(timeInSeconds, timeText) {
 function sendUnit1(stu_button) {
     console.log('student sent');
     var stu = myUnits.create(400, game.world.height - 335 + Math.random() * 30, 'student', 0);
+    cool = 3000
     stu_button.inputEnabled = false;
-    game.time.events.add(3000, buttonReset, this, stu_button);
+    game.time.events.add(cool, buttonReset, this, stu_button);
     stu.scale.setTo(.5, .5);
     stu.health = 500;
     stu.attack = 5;
     stu.body.velocity.x = 200;
+    stu.text = game.add.text(stu.x - 350, stu.y - 510, stu.health);
+    stu.addChild(stu.text);
     //timer.add(3000, restoreButton, this);
     //timer.start();
     //game.debug.text(timer.duration.toFixed(0), 410, 755, '#0000');
-    cooldown(410, 755, 3000);
+    //cooldown(410, 755, 3000);
+    stu_button.frame = 3;
+    game.time.events.add(cool, function(){stu_button.frame = 0}, stu_button);
     stu.animations.add('run', [0, 1, 2, 3, 4, 5, 6, 7], 8, true);
     stu.animations.play('run');
 }
@@ -416,13 +416,18 @@ function sendUnit1(stu_button) {
 function sendUnit2(fac_button) {
     console.log('faculty sent');
     var fac = myUnits.create(400, game.world.height - 375 + Math.random() * 30, 'faculty', 0);
+    cool = 3000
     fac_button.inputEnabled = false;
-    game.time.events.add(3000, buttonReset, this, fac_button);
+    game.time.events.add(cool, buttonReset, this, fac_button);
     fac.scale.setTo(.4, .4);
     fac.body.velocity.x = 200;
     fac.health = 400;
     fac.attack = 5;
-    cooldown(480, 755, 3000);
+    fac.text = game.add.text(fac.x - 320, fac.y - 460, fac.health);
+    fac.addChild(fac.text);
+    //cooldown(480, 755, 3000);
+    fac_button.loadTexture('cover');
+    game.time.events.add(cool, function(){fac_button.loadTexture('place_buttons', 1)}, fac_button);
     fac.animations.add('run', [0, 1, 2, 3, 4, 5, 6, 7], 8, true);
     fac.animations.play('run');
 
@@ -431,13 +436,17 @@ function sendUnit2(fac_button) {
 function sendUnit3(exec_button) {
     console.log('exec sent');
     var exec = myUnits.create(400, game.world.height - 375 + Math.random() * 30, 'football_player', 4);
+    cool = 6000
     exec_button.inputEnabled = false;
-    game.time.events.add(6000, buttonReset, this, exec_button);
+    game.time.events.add(cool, buttonReset, this, exec_button);
     exec.body.velocity.x = 200;
     exec.scale.setTo(2, 2);
     exec.health = 1000;
     exec.attack = 20;
-    cooldown(550, 755, 3000);
+    exec.text = game.add.text(exec.x - 390, exec.y - 450, exec.health, {font: '12px'});
+    exec.addChild(exec.text);
+    exec_button.loadTexture('cover');
+    game.time.events.add(cool, function(){exec_button.loadTexture('place_buttons', 2)}, exec_button);
     exec.animations.add('run', [3, 4, 5, 6, 7], 5, true);
     exec.animations.play('run');
 }
@@ -449,19 +458,28 @@ function tower_fire() {
 function deploy_truck(truck_pow) {
     console.log('truck sent');
     var e = truck.create(0, game.world.height - 500, 'truck_body');
+    cool = 10000
     truck_pow.inputEnabled = false;
-    game.time.events.add(10000, buttonReset, this, truck_pow);
+    game.time.events.add(cool, buttonReset, this, truck_pow);
+    //truck_pow.loadTexture('cover');
+    truck_pow.visible = false;
+    game.time.events.add(cool, function(){truck_pow.visible = true}, truck_pow);
     e.body.velocity.x = 500;
 }
 
 function deploy_matt(matt_pow) {
     console.log('matt deployed');
     var m = matt.create(425, game.world.height - 395, 'matt', 2);
+    cool = 10000
     matt_pow.inputEnabled = false;
-    game.time.events.add(10000, buttonReset, this, matt_pow);
+    game.time.events.add(cool, buttonReset, this, matt_pow);
     m.scale.setTo(2.5, 2.5);
     m.health = 10000;
     m.attack = 150;
+    m.text = game.add.text(m.x - 350, m.y - 420, m.health, {font: '12px'});
+    m.addChild(m.text);
+    matt_pow.loadTexture('cover');
+    game.time.events.add(cool, function(){matt_pow.loadTexture('powerups', 1)}, matt_pow);
     m.animations.add('attack', [2, 6, 7, 8, 9, 10, 11], 7, true);
     m.animations.play('attack');
 }
@@ -485,7 +503,10 @@ function horde_send() {
 }
 function deploy_horde(horde_pow) {
     horde_pow.inputEnabled = false;
-    game.time.events.add(10000, buttonReset, this, horde_pow);
+    cool = 10000
+    game.time.events.add(cool, buttonReset, this, horde_pow);
+    horde_pow.loadTexture('cover');
+    game.time.events.add(cool, function(){horde_pow.loadTexture('powerups', 2)}, horde_pow);
     horde_send()
     
 }
@@ -493,7 +514,10 @@ function deploy_horde(horde_pow) {
 function make_it_rain(rain_pow) {
     console.log("making it rain!");
     rain_pow.inputEnabled = false;
-    game.time.events.add(10000, buttonReset, this, rain_pow);
+    cool = 10000
+    game.time.events.add(cool, buttonReset, this, rain_pow);
+    rain_pow.loadTexture('cover');
+    game.time.events.add(cool, function(){rain_pow.loadTexture('powerups', 3)}, rain_pow);
     for (i = 0; i < 50; i++) {
         var e = rain.create(Math.random() * game.world.width, 0, 'money', 0);
         e.frame = 0;
