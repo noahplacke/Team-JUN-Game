@@ -39,8 +39,11 @@ mascot_raid.main_state.prototype = {
         game.load.spritesheet('place_buttons', 'assets/placehold_buttons.png', 64, 64, 4);
         game.load.spritesheet('place_unit', 'assets/placehold_unit.png', 64, 64, 3);
         game.load.spritesheet('student', 'assets/student.png', 108, 140, 8);
+        game.load.spritesheet('ene_student', 'assets/ene_student.png', 108, 140, 8);
         game.load.spritesheet('faculty', 'assets/faculty.png', 175, 245, 8);
+        game.load.spritesheet('ene_faculty', 'assets/ene_faculty.png', 175, 245, 8);
         game.load.spritesheet('football_player', 'assets/football_player.png', 37.75, 60, 8);
+        game.load.spritesheet('ene_football_player', 'assets/ene_football_player.png', 37.75, 60, 8);
         game.load.image('bevo', 'assets/bevo.png');
         game.load.image('tower', 'assets/tower.png');
         game.load.image('truck_body', 'assets/truck/full.png');
@@ -329,41 +332,45 @@ function collisionHandler4(unit, base) {
 
 function deploy_lvl1() {
     //console.log("units made");
-    var e = enemy.create(2200 + Math.random() * 400, game.world.height - 300 + Math.random() * 10, 'lvl1', 0);
+    var e = enemy.create(2200 + Math.random() * 400, game.world.height - 330 + Math.random() * 10, 'ene_student', 0);
     e.health = 500;
     e.attack = 5;
     e.frame = 0;
     e.body.velocity.x = -200;
-    e.animations.add('left', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], 16, true);
+    e.scale.setTo(.5, .5);
+    e.scale.x *= -1;
+    e.animations.add('left', [0, 1, 2, 3, 4, 5, 6, 7], 8, true);
     e.animations.play('left');
 
 }
 
 function deploy_lvl2() {
     //console.log("units made");
-    var e = enemy.create(2200 + Math.random() * 400, game.world.height - 325 + Math.random() * 10, 'lvl2', 0);
+    var e = enemy.create(2200 + Math.random() * 400, game.world.height - 325 + Math.random() * 10, 'ene_faculty', 0);
     e.health = 1000;
     e.attack = 15;
     e.anchor.setTo(.5, .5);
-    e.scale.x *= -1;
     e.frame = 0;
     e.body.velocity.x = -200;
-    e.animations.add('left', [10, 11, 12, 13, 14, 15, 16], 7, true);
-    e.animations.play('left');
+    e.scale.setTo(.4, .4);
+    e.scale.x *= -1;
+    e.animations.add('run', [0, 1, 2, 3, 4, 5, 6, 7], 8, true);
+    e.animations.play('run');
 
 }
 
 function deploy_lvl3() {
     //console.log("units made");
-    var e = enemy.create(2200 + Math.random() * 400, game.world.height - 300 + Math.random() * 10, 'lvl3', 0);
+    var e = enemy.create(2200 + Math.random() * 400, game.world.height - 300 + Math.random() * 10, 'ene_football_player', 4);
     e.health = 1500;
     e.attack = 50;
     e.anchor.setTo(.5, .5);
+    e.scale.setTo(2, 2);
     e.scale.x *= -1;
     e.frame = 0;
     e.body.velocity.x = -200;
-    e.animations.add('left', [38, 39, 40], 3, true);
-    e.animations.play('left');
+    e.animations.add('run', [3, 4, 5, 6, 7], 5, true);
+    e.animations.play('run');
 
 }
 
