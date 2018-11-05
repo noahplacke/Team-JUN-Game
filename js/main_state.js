@@ -15,6 +15,8 @@ var lvl3;
 var cursors;
 var myTower;
 var ram_count = 20;
+var player;
+var dir = "right";
 
 var ballTime = 0;
 var ball;
@@ -38,6 +40,7 @@ mascot_raid.main_state.prototype = {
         game.load.spritesheet('landmarks', 'assets/landmarks.png', 480, 600, 2);
         game.load.spritesheet('place_buttons', 'assets/placehold_buttons.png', 64, 64, 4);
         game.load.spritesheet('place_unit', 'assets/placehold_unit.png', 64, 64, 3);
+        game.load.spritesheet('unit_buttons', 'assets/unit_buttons.png', 64, 64, 4);
         game.load.spritesheet('student', 'assets/student.png', 108, 140, 8);
         game.load.spritesheet('ene_student', 'assets/ene_student.png', 108, 140, 8);
         game.load.spritesheet('faculty', 'assets/faculty.png', 175, 245, 8);
@@ -51,6 +54,7 @@ mascot_raid.main_state.prototype = {
         game.load.spritesheet('matt', 'assets/matt_sprites.png', 165, 57, 49);
         game.load.spritesheet('horde', 'assets/horde.png', 15, 32, 8);
         game.load.image('cover', 'assets/cover.png');
+        game.load.spritesheet('player', 'assets/player/player.png', 128, 128);
         console.log("In game");
 
     },
@@ -109,15 +113,18 @@ mascot_raid.main_state.prototype = {
         exit.onInputDown.add(exit_pressed, this);
 
         //add buttons to send units
-        var stu_button = game.add.button(400, 675, 'place_buttons', "", this, 0);
+        var stu_button = game.add.button(400, 675, 'unit_buttons', "", this, 0);
         stu_button.fixedToCamera = true;
         stu_button.onInputDown.add(sendUnit1, this);
-        var fac_button = game.add.button(470, 675, 'place_buttons', "", this, 1, 1);
+        var fac_button = game.add.button(470, 675, 'unit_buttons', "", this, 1, 1);
         fac_button.fixedToCamera = true;
         fac_button.onInputDown.add(sendUnit2, this);
-        var exec_button = game.add.button(540, 675, 'place_buttons', "", this, 2, 2);
+        var exec_button = game.add.button(540, 675, 'unit_buttons', "", this, 2, 2);
         exec_button.fixedToCamera = true;
         exec_button.onInputDown.add(sendUnit3, this);
+        
+        //create Player unit
+        createPlayer(200, game.world.height - 300);
 
         //create unit group
         myUnits = game.add.group();
@@ -203,6 +210,8 @@ mascot_raid.main_state.prototype = {
         game.physics.arcade.overlap(am_tower, myUnits, amCollisionHandler, null, this);
         game.physics.arcade.overlap(matt, enemy, collisionHandler2, null, this);
         game.physics.arcade.overlap(horde, enemy, collisionHandler, null, this);
+        game.physics.arcade.overlap(player, enemy, playerCollisionHandler, null, this);
+        playerUpdate();
 
 
 
@@ -434,7 +443,7 @@ function sendUnit2(fac_button) {
     fac.addChild(fac.text);
     //cooldown(480, 755, 3000);
     fac_button.loadTexture('cover');
-    game.time.events.add(cool, function(){fac_button.loadTexture('place_buttons', 1)}, fac_button);
+    game.time.events.add(cool, function(){fac_button.loadTexture('unit_buttons', 1)}, fac_button);
     fac.animations.add('run', [0, 1, 2, 3, 4, 5, 6, 7], 8, true);
     fac.animations.play('run');
 
@@ -453,7 +462,7 @@ function sendUnit3(exec_button) {
     exec.text = game.add.text(exec.x - 390, exec.y - 450, exec.health, {font: '12px'});
     exec.addChild(exec.text);
     exec_button.loadTexture('cover');
-    game.time.events.add(cool, function(){exec_button.loadTexture('place_buttons', 2)}, exec_button);
+    game.time.events.add(cool, function(){exec_button.loadTexture('unit_buttons', 2)}, exec_button);
     exec.animations.add('run', [3, 4, 5, 6, 7], 5, true);
     exec.animations.play('run');
 }
@@ -529,5 +538,89 @@ function make_it_rain(rain_pow) {
         var e = rain.create(Math.random() * game.world.width, 0, 'money', 0);
         e.frame = 0;
         e.body.velocity.y = 200;
+    }
+}
+
+function playerUpdate(){
+    //game.physics.arcade.collide(something, something);
+    player.body.velocity.x = 0;
+    player.body.velocity.y = 0;
+
+    if (cursors.left.isDown){
+        if (dir != "left"){
+            player.scale.x *= -1;
+        }
+        dir = "left";
+        if (cursors.up.isDown) {
+            player.body.velocity.x = -150;
+            player.body.velocity.y = -150;
+            player.animations.play('walk');
+        } else if (cursors.down.isDown) {
+            player.body.velocity.x = -150;
+            player.body.velocity.y = 150;
+            player.animations.play('walk');
+        } else {
+            player.body.velocity.x = -150;
+            player.animations.play('walk');
+        }
+    
+    } else if (cursors.right.isDown){
+        if (dir != "right") {
+            player.scale.x *= -1;
+        }
+        dir = "right";
+        if (cursors.up.isDown) {
+            player.body.velocity.x = 150;
+            player.body.velocity.y = -150;
+            player.animations.play('walk');
+        } else if (cursors.down.isDown) {
+            player.body.velocity.x = 150;
+            player.body.velocity.y = 150;
+            player.animations.play('walk');
+        } else {
+            player.body.velocity.x = 150;
+            player.animations.play('walk');
+        }
+    } else if (cursors.up.isDown){
+        player.body.velocity.y = -150;
+        player.animations.play('walk');
+    } else if (cursors.down.isDown) {
+        player.body.velocity.y = 150;
+        player.animations.play('walk');
+    } else if (game.input.keyboard.isDown(Phaser.Keyboard.F)) {
+        player.animations.play('attack1');
+    } else if (game.input.keyboard.isDown(Phaser.Keyboard.D)) {
+        player.animations.play('attack2');
+    }
+    else if (game.input.keyboard.isDown(Phaser.Keyboard.S)) {
+        player.animations.play('attack3');
+    } else {
+        player.animations.play('still');
+    }
+}
+function createPlayer(x,y){
+    player = game.add.sprite(x, y, 'player');
+    game.physics.arcade.enable(player);
+    player.body.bounce.y = 0.2;
+    player.body.colliderWorldBounds = true;
+    player.animations.add('still', [0,1,2,3,4,5,6,7,8,9], 10, true);
+    player.animations.add('walk', [10, 11, 12, 13, 14, 15], 10, true);
+    player.animations.add('double', [20, 21, 22, 23, 24, 25, 26, 27, 28, 29], 10, true);
+    player.animations.add('attack1', [47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68], 20, true);
+    player.animations.add('attack2', [32,33,34,35,36,37,38,39,40,41,42,43,44], 20, true);
+    player.animations.add('attack3', [71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98], 20, true);
+    player.anchor.setTo(.5, .5);
+}
+function playerCollisionHandler(player, ene) {
+    ene.body.velocity.x = 0;
+    if (game.input.keyboard.isDown(Phaser.Keyboard.F)){
+        ene.health -= 5;
+    } else if (game.input.keyboard.isDown(Phaser.Keyboard.D)){
+        ene.health -= 20;
+    } else if (game.input.keyboard.isDown(Phaser.Keyboard.S)){
+        ene.kill();
+    }
+    if (ene.health <= 0){
+        ene.kill();
     }
 }
