@@ -98,15 +98,23 @@ mascot_raid.main_state.prototype = {
         var matt_pow = game.add.button(120, 675, 'powerups', "", this, 1, 1, 1);
         matt_pow.fixedToCamera = true;
         matt_pow.onInputDown.add(deploy_matt, this);
+        var keyW = game.input.keyboard.addKey(Phaser.Keyboard.W);
+        keyW.onDown.add(deploy_matt, this, matt_pow);
         var horde_pow = game.add.button(190, 675, 'powerups', "", this, 2, 2, 2);
         horde_pow.fixedToCamera = true;
         horde_pow.onInputDown.add(deploy_horde, this);
+        var keyE = game.input.keyboard.addKey(Phaser.Keyboard.E);
+        keyE.onDown.add(deploy_horde, this);
         var rain_pow = game.add.button(260, 675, 'powerups', "", this, 3, 3, 3);
         rain_pow.fixedToCamera = true;
         rain_pow.onInputDown.add(make_it_rain, this);
+        var keyR = game.input.keyboard.addKey(Phaser.Keyboard.R);
+        keyR.onDown.add(make_it_rain, this);
         var truck_pow = game.add.button(50, 675, 'powerups', "", this, 0, 0, 0);
         truck_pow.fixedToCamera = true;
         truck_pow.onInputDown.add(deploy_truck, this);
+        var keyQ = game.input.keyboard.addKey(Phaser.Keyboard.Q);
+        keyQ.onDown.add(deploy_truck, this, truck_pow);
 
         var exit = game.add.button(700, 625, 'button', "", this, 1, 1, 1);
         exit.fixedToCamera = true;
@@ -125,6 +133,7 @@ mascot_raid.main_state.prototype = {
         
         //create Player unit
         createPlayer(200, game.world.height - 300);
+        player.body.collideWorldBounds = true;
 
         //create unit group
         myUnits = game.add.group();
@@ -195,6 +204,10 @@ mascot_raid.main_state.prototype = {
 
         cursors = game.input.keyboard.createCursorKeys();
         game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR]);
+        
+        //camera follows player
+        game.camera.follow(player);
+        game.camera.deadzone = new Phaser.Rectangle(centerX - 200, 0, 1200, 800);
 
 
         addKeyListen();
@@ -212,6 +225,7 @@ mascot_raid.main_state.prototype = {
         game.physics.arcade.overlap(horde, enemy, collisionHandler, null, this);
         game.physics.arcade.overlap(player, enemy, playerCollisionHandler, null, this);
         playerUpdate();
+        //keyboardShortcuts();
 
 
 
@@ -387,6 +401,10 @@ function buttonReset(button) {
     button.inputEnabled = true;
 }
 
+function keyReset(key) {
+    key.enabled = true;
+}
+
 function cooldown(x, y, time) {
     //timeInSeconds = time / 1000;
     //timeText = game.add.text(x + 15, y - 20, timeInSeconds);
@@ -471,24 +489,30 @@ function tower_fire() {
     console.log('firing');
 }
 
-function deploy_truck(truck_pow) {
+function deploy_truck(truck_pow, keyQ) {
     console.log('truck sent');
     var e = truck.create(0, game.world.height - 500, 'truck_body');
     cool = 10000
     truck_pow.inputEnabled = false;
     game.time.events.add(cool, buttonReset, this, truck_pow);
+    keyQ = game.input.keyboard.addKey(Phaser.Keyboard.Q);
+    keyQ.enabled = false;
+    game.time.events.add(cool, keyReset, this, keyQ);
     //truck_pow.loadTexture('cover');
     truck_pow.visible = false;
     game.time.events.add(cool, function(){truck_pow.visible = true}, truck_pow);
     e.body.velocity.x = 500;
 }
 
-function deploy_matt(matt_pow) {
+function deploy_matt(matt_pow, keyW) {
     console.log('matt deployed');
     var m = matt.create(425, game.world.height - 395, 'matt', 2);
     cool = 10000
     matt_pow.inputEnabled = false;
     game.time.events.add(cool, buttonReset, this, matt_pow);
+    keyW = game.input.keyboard.addKey(Phaser.Keyboard.W);
+    keyW.enabled = false;
+    game.time.events.add(cool, keyReset, this, keyW);
     m.scale.setTo(2.5, 2.5);
     m.health = 10000;
     m.attack = 150;
@@ -517,21 +541,27 @@ function horde_send() {
         }
     }, 100);
 }
-function deploy_horde(horde_pow) {
+function deploy_horde(horde_pow, keyE) {
     horde_pow.inputEnabled = false;
     cool = 10000
     game.time.events.add(cool, buttonReset, this, horde_pow);
+    keyE = game.input.keyboard.addKey(Phaser.Keyboard.E);
+    keyE.enabled = false;
+    game.time.events.add(cool, keyReset, this, keyE);
     horde_pow.loadTexture('cover');
     game.time.events.add(cool, function(){horde_pow.loadTexture('powerups', 2)}, horde_pow);
     horde_send()
     
 }
 
-function make_it_rain(rain_pow) {
+function make_it_rain(rain_pow, keyR) {
     console.log("making it rain!");
     rain_pow.inputEnabled = false;
     cool = 10000
     game.time.events.add(cool, buttonReset, this, rain_pow);
+    keyR = game.input.keyboard.addKey(Phaser.Keyboard.R);
+    keyR.enabled = false;
+    game.time.events.add(cool, keyReset, this, keyR);
     rain_pow.loadTexture('cover');
     game.time.events.add(cool, function(){rain_pow.loadTexture('powerups', 3)}, rain_pow);
     for (i = 0; i < 50; i++) {
@@ -624,3 +654,8 @@ function playerCollisionHandler(player, ene) {
         ene.kill();
     }
 }
+
+/*function keyboardShortcuts() {
+    keyQ = game.input.keyboard.addKey(Phaser.Keyboard.Q);
+    keyQ.onDown.add(deploy_truck, this);
+}*/
