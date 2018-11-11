@@ -5,7 +5,7 @@ mascot_raid.credits.prototype = {
     preload: function () {
         game.load.image('main_menu', 'assets/main_menu.png');
         game.load.spritesheet('game_logo', 'assets/game_logo.png', 300, 300);
-        game.load.spritesheet('button', 'assets/button_sprite_sheet.png', 100, 100, 4);
+        game.load.spritesheet('button', 'assets/button_sprite_sheet.png', 64, 64, 5);
         console.log("credits");
     },
     create: function () {

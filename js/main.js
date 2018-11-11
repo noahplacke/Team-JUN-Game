@@ -2,6 +2,7 @@ var game = new Phaser.Game(1400, 800, Phaser.AUTO, 'gameDiv');
 game.state.add('main_menu', mascot_raid.main_menu);
 game.state.add('game_scene_0', mascot_raid.game_scene_0);
 game.state.add('credits', mascot_raid.credits);
+game.state.add('tutorial', mascot_raid.tutorial);
 game.state.add('main_state', mascot_raid.main_state);
 game.state.start('main_menu');
 
@@ -12,7 +13,8 @@ function addKeyListen() {
 }
 
 function in_game() {
-    game.state.start('main_state');
+    //game.state.start('main_state');
+    game.state.start('tutorial');
 }
 
 function in_credits() {

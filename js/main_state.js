@@ -30,7 +30,7 @@ mascot_raid.main_state.prototype = {
         game.load.image('ground', 'assets/ground.png');
         game.load.spritesheet('tree', 'assets/trees.png');
         game.load.spritesheet('powerups', 'assets/powerup_buttons.png', 64, 64, 5);
-        game.load.spritesheet('button', 'assets/button_sprite_sheet.png', 100, 100, 4);
+        game.load.spritesheet('button', 'assets/button_sprite_sheet.png', 64, 64, 5);
         game.load.audio('sprint1_music', 'assets/sprint1_music.mp3')
         game.load.image('ball', 'assets/ball.png');
         game.load.image('money', 'assets/money.png');
@@ -99,7 +99,7 @@ mascot_raid.main_state.prototype = {
         matt_pow.fixedToCamera = true;
         matt_pow.onInputDown.add(deploy_matt, this);
         var keyW = game.input.keyboard.addKey(Phaser.Keyboard.W);
-        keyW.onDown.add(deploy_matt, this, matt_pow);
+        keyW.onDown.add(deploy_matt, this, 0, matt_pow, keyW);
         var horde_pow = game.add.button(190, 675, 'powerups', "", this, 2, 2, 2);
         horde_pow.fixedToCamera = true;
         horde_pow.onInputDown.add(deploy_horde, this);
@@ -114,11 +114,18 @@ mascot_raid.main_state.prototype = {
         truck_pow.fixedToCamera = true;
         truck_pow.onInputDown.add(deploy_truck, this);
         var keyQ = game.input.keyboard.addKey(Phaser.Keyboard.Q);
-        keyQ.onDown.add(deploy_truck, this, truck_pow);
+        keyQ.onDown.add(deploy_truck, this, 0, truck_pow, keyQ);
 
-        var exit = game.add.button(700, 625, 'button', "", this, 1, 1, 1);
+        var exit = game.add.button(700, 650, 'button', "", this, 1, 1, 1);
+        exit.scale.setTo(1.5, 1.5);
         exit.fixedToCamera = true;
         exit.onInputDown.add(exit_pressed, this);
+        
+        //creating pause menu for tips
+        var pause_button = game.add.button(800, 650, 'button', "", this, 4, 4, 4);
+        pause_button.scale.setTo(1.5, 1.5);
+        pause_button.fixedToCamera = true;
+        pause_button.onInputDown.add(pause_menu, this);
 
         //add buttons to send units
         var stu_button = game.add.button(400, 675, 'unit_buttons', "", this, 0);
@@ -195,12 +202,6 @@ mascot_raid.main_state.prototype = {
             b.checkWorldBounds = true;
             b.events.onOutOfBounds.add(resetball, this);
         }
-
-        //tower self defense creation
-        var myTower = myUnits.create(210, 85, 'tower');
-        if (Phaser.Math.distance(myTower.x, myTower.y, enemy.children.x, enemy.children.y) < 600)
-            tower_fire()
-
 
         cursors = game.input.keyboard.createCursorKeys();
         game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR]);
@@ -655,7 +656,22 @@ function playerCollisionHandler(player, ene) {
     }
 }
 
-/*function keyboardShortcuts() {
-    keyQ = game.input.keyboard.addKey(Phaser.Keyboard.Q);
-    keyQ.onDown.add(deploy_truck, this);
-}*/
+function pause_menu() {
+    game.paused = true;
+    var style1 = {font: "35px Arial", fill: "#00000", align: "center"};
+    text1 = game.add.text(350, 100, "GAME PAUSED -- CLICK ANYWHERE TO CONTINUE", style1);
+    text2 = game.add.text(350, 150, "QWER to use Power Ups", style1);
+    text3 = game.add.text(350, 200, "ZXC to send Units", style1);
+    text4 = game.add.text(350, 250, "Only Units can damage enemy tower", style1);
+    text5 = game.add.text(350, 300, "Arrow keys to move player -- SDF to attack", style1);
+    game.input.onDown.add(unpause, self);
+}
+
+function unpause(event) {
+    text1.destroy();
+    text2.destroy();
+    text3.destroy();
+    text4.destroy();
+    text5.destroy();
+    game.paused = false;
+}
