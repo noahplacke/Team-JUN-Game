@@ -131,12 +131,18 @@ mascot_raid.main_state.prototype = {
         var stu_button = game.add.button(400, 675, 'unit_buttons', "", this, 0);
         stu_button.fixedToCamera = true;
         stu_button.onInputDown.add(sendUnit1, this);
+        var keyZ = game.input.keyboard.addKey(Phaser.Keyboard.Z);
+        keyZ.onDown.add(sendUnit1, this);
         var fac_button = game.add.button(470, 675, 'unit_buttons', "", this, 1, 1);
         fac_button.fixedToCamera = true;
         fac_button.onInputDown.add(sendUnit2, this);
+        var keyX = game.input.keyboard.addKey(Phaser.Keyboard.X);
+        keyX.onDown.add(sendUnit2, this);
         var exec_button = game.add.button(540, 675, 'unit_buttons', "", this, 2, 2);
         exec_button.fixedToCamera = true;
         exec_button.onInputDown.add(sendUnit3, this);
+        var keyC = game.input.keyboard.addKey(Phaser.Keyboard.C);
+        keyC.onDown.add(sendUnit3, this);
         
         //create Player unit
         createPlayer(200, game.world.height - 300);
@@ -292,6 +298,7 @@ function collisionHandler2(myUnits, ene) {
     if (myUnits.health <= 0) {
         myUnits.kill();
         ene.body.velocity.x = -200;
+        //enemy.setAll(this.body.velocity.x, -200);
     } else if (ene.health <= 0) {
         ene.kill();
         myUnits.body.velocity.x = 200;
@@ -438,12 +445,18 @@ function sendUnit1(stu_button) {
     stu.body.velocity.x = 200;
     stu.text = game.add.text(stu.x - 350, stu.y - 510, stu.health);
     stu.addChild(stu.text);
+    keyZ = game.input.keyboard.addKey(Phaser.Keyboard.Z);
+    keyZ.enabled = false;
+    game.time.events.add(cool, keyReset, this, keyZ);
     //timer.add(3000, restoreButton, this);
     //timer.start();
     //game.debug.text(timer.duration.toFixed(0), 410, 755, '#0000');
     //cooldown(410, 755, 3000);
-    stu_button.frame = 3;
-    game.time.events.add(cool, function(){stu_button.frame = 0}, stu_button);
+    //stu_button.frame = 3;
+    var cov = game.add.sprite(game.camera.y + 400, 675, 'cover');
+    cov.fixedToCamera = true;
+    //game.time.events.add(cool, function(){stu_button.frame = 0}, stu_button);
+    game.time.events.add(cool, function(){cov.destroy()}, stu_button);
     stu.animations.add('run', [0, 1, 2, 3, 4, 5, 6, 7], 8, true);
     stu.animations.play('run');
 }
@@ -460,9 +473,15 @@ function sendUnit2(fac_button) {
     fac.attack = 5;
     fac.text = game.add.text(fac.x - 320, fac.y - 460, fac.health);
     fac.addChild(fac.text);
+    keyX = game.input.keyboard.addKey(Phaser.Keyboard.X);
+    keyX.enabled = false;
+    game.time.events.add(cool, keyReset, this, keyX);
     //cooldown(480, 755, 3000);
-    fac_button.loadTexture('cover');
-    game.time.events.add(cool, function(){fac_button.loadTexture('unit_buttons', 1)}, fac_button);
+    var cov = game.add.sprite(game.camera.y + 470, 675, 'cover');
+    cov.fixedToCamera = true;
+    //fac_button.loadTexture('cover');
+    //game.time.events.add(cool, function(){fac_button.loadTexture('unit_buttons', 1)}, fac_button);
+    game.time.events.add(cool, function(){cov.destroy()}, fac_button);
     fac.animations.add('run', [0, 1, 2, 3, 4, 5, 6, 7], 8, true);
     fac.animations.play('run');
 
@@ -480,8 +499,14 @@ function sendUnit3(exec_button) {
     exec.attack = 20;
     exec.text = game.add.text(exec.x - 390, exec.y - 450, exec.health, {font: '12px'});
     exec.addChild(exec.text);
-    exec_button.loadTexture('cover');
-    game.time.events.add(cool, function(){exec_button.loadTexture('unit_buttons', 2)}, exec_button);
+    keyC = game.input.keyboard.addKey(Phaser.Keyboard.C);
+    keyC.enabled = false;
+    game.time.events.add(cool, keyReset, this, keyC);
+    var cov = game.add.sprite(game.camera.y + 540, 675, 'cover');
+    cov.fixedToCamera = true;
+    //exec_button.loadTexture('cover');
+    //game.time.events.add(cool, function(){exec_button.loadTexture('unit_buttons', 2)}, exec_button);
+    game.time.events.add(cool, function(){cov.destroy()}, exec_button);
     exec.animations.add('run', [3, 4, 5, 6, 7], 5, true);
     exec.animations.play('run');
 }
@@ -500,8 +525,11 @@ function deploy_truck(truck_pow, keyQ) {
     keyQ.enabled = false;
     game.time.events.add(cool, keyReset, this, keyQ);
     //truck_pow.loadTexture('cover');
-    truck_pow.visible = false;
-    game.time.events.add(cool, function(){truck_pow.visible = true}, truck_pow);
+    //truck_pow.visible = false;
+    var cov = game.add.sprite(game.camera.y + 50, 675, 'cover');
+    cov.fixedToCamera = true;
+    //game.time.events.add(cool, function(){truck_pow.visible = true}, truck_pow);
+    game.time.events.add(cool, function(){cov.destroy()}, truck_pow);
     e.body.velocity.x = 500;
 }
 
@@ -519,8 +547,11 @@ function deploy_matt(matt_pow, keyW) {
     m.attack = 150;
     m.text = game.add.text(m.x - 350, m.y - 420, m.health, {font: '12px'});
     m.addChild(m.text);
-    matt_pow.loadTexture('cover');
-    game.time.events.add(cool, function(){matt_pow.loadTexture('powerups', 1)}, matt_pow);
+    var cov = game.add.sprite(game.camera.y + 120, 675, 'cover');
+    cov.fixedToCamera = true;
+    //matt_pow.loadTexture('cover');
+    //game.time.events.add(cool, function(){matt_pow.loadTexture('powerups', 1)}, matt_pow);
+    game.time.events.add(cool, function(){cov.destroy()}, matt_pow);
     m.animations.add('attack', [2, 6, 7, 8, 9, 10, 11], 7, true);
     m.animations.play('attack');
 }
@@ -549,8 +580,11 @@ function deploy_horde(horde_pow, keyE) {
     keyE = game.input.keyboard.addKey(Phaser.Keyboard.E);
     keyE.enabled = false;
     game.time.events.add(cool, keyReset, this, keyE);
-    horde_pow.loadTexture('cover');
-    game.time.events.add(cool, function(){horde_pow.loadTexture('powerups', 2)}, horde_pow);
+    var cov = game.add.sprite(game.camera.y + 190, 675, 'cover');
+    cov.fixedToCamera = true;
+    //horde_pow.loadTexture('cover');
+    //game.time.events.add(cool, function(){horde_pow.loadTexture('powerups', 2)}, horde_pow);
+    game.time.events.add(cool, function(){cov.destroy()}, horde_pow);
     horde_send()
     
 }
@@ -563,8 +597,11 @@ function make_it_rain(rain_pow, keyR) {
     keyR = game.input.keyboard.addKey(Phaser.Keyboard.R);
     keyR.enabled = false;
     game.time.events.add(cool, keyReset, this, keyR);
-    rain_pow.loadTexture('cover');
-    game.time.events.add(cool, function(){rain_pow.loadTexture('powerups', 3)}, rain_pow);
+    var cov = game.add.sprite(game.camera.y + 260, 675, 'cover');
+    cov.fixedToCamera = true;
+    //rain_pow.loadTexture('cover');
+    //game.time.events.add(cool, function(){rain_pow.loadTexture('powerups', 3)}, rain_pow);
+    game.time.events.add(cool, function(){cov.destroy()}, rain_pow);
     for (i = 0; i < 50; i++) {
         var e = rain.create(Math.random() * game.world.width, 0, 'money', 0);
         e.frame = 0;
@@ -659,11 +696,16 @@ function playerCollisionHandler(player, ene) {
 function pause_menu() {
     game.paused = true;
     var style1 = {font: "35px Arial", fill: "#00000", align: "center"};
-    text1 = game.add.text(350, 100, "GAME PAUSED -- CLICK ANYWHERE TO CONTINUE", style1);
-    text2 = game.add.text(350, 150, "QWER to use Power Ups", style1);
-    text3 = game.add.text(350, 200, "ZXC to send Units", style1);
-    text4 = game.add.text(350, 250, "Only Units can damage enemy tower", style1);
-    text5 = game.add.text(350, 300, "Arrow keys to move player -- SDF to attack", style1);
+    text1 = game.add.text(game.camera.x + 350, 100, "GAME PAUSED -- CLICK ANYWHERE TO CONTINUE", style1);
+    text1.fixedToCamera = true;
+    text2 = game.add.text(game.camera.x + 350, 150, "QWER to use Power Ups", style1);
+    text2.fixedToCamera = true;
+    text3 = game.add.text(game.camera.x + 350, 200, "ZXC to send Units", style1);
+    text3.fixedToCamera = true;
+    text4 = game.add.text(game.camera.x + 350, 250, "Only Units can damage enemy tower", style1);
+    text4.fixedToCamera = true;
+    text5 = game.add.text(game.camera.x + 350, 300, "Arrow keys to move player -- SDF to attack", style1);
+    text5.fixedToCamera = true;
     game.input.onDown.add(unpause, self);
 }
 
