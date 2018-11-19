@@ -282,26 +282,27 @@ function collisionHandler(ball, ene) {
 
 }
 
-function collisionHandler2(myUnits, ene) {
+function collisionHandler2(unit, ene) {
 
-    myUnits.body.velocity.x = 0;
+    unit.body.velocity.x = 0;
     ene.body.velocity.x = 0;
-    myUnits.text.setText(myUnits.health);
+    unit.text.setText(unit.health);
     var timeDelay = 0;
     if (game.time.now > timeDelay) {
-        myUnits.health = myUnits.health - ene.attack;
+        unit.health = unit.health - ene.attack;
         ene.health = ene.health - ene.attack;
         timeDelay = game.time.now + 1000;
     }
     //console.log(myUnits.health);
     //console.log(ene.health);
-    if (myUnits.health <= 0) {
-        myUnits.kill();
-        ene.body.velocity.x = -200;
-        //enemy.setAll(this.body.velocity.x, -200);
+    if (unit.health <= 0) {
+        unit.kill();
+        //ene.body.velocity.x = -200;
+        enemy.setAll('body.velocity.x', -200);
     } else if (ene.health <= 0) {
         ene.kill();
-        myUnits.body.velocity.x = 200;
+        //myUnits.body.velocity.x = 200;
+        myUnits.setAll('body.velocity.x', 200);
     }
 }
 
