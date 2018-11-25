@@ -55,14 +55,26 @@ mascot_raid.main_state.prototype = {
         game.load.spritesheet('horde', 'assets/horde.png', 15, 32, 8);
         game.load.image('cover', 'assets/cover.png');
         game.load.spritesheet('player', 'assets/player/player.png', 128, 128);
+        //all the audio
+        game.load.audio('song', 'assets/audio/texas_song.mp3');
+        game.load.audio('bevo_moo', 'assets/audio/bevo_moo.wav');
+        game.load.audio('matt_sound', 'assets/audio/matt_sound.mp3');
+        game.load.audio('cha_ching', 'assets/audio/cha_ching.wav');
+        game.load.audio('horde_sound', 'assets/audio/horde_sound.wav');
+        game.load.audio('stu_sound', 'assets/audio/stu_sound.wav');
+        game.load.audio('fac_sound', 'assets/audio/fac_sound.wav');
+        game.load.audio('exec_sound', 'assets/audio/exec_sound.wav');
         console.log("In game");
 
     },
 
     create: function() {
-        var music = game.add.audio('sprint1_music');
-        //This music loops everytime. Need to find to have it stop when played alreay so that it doesn't overlap.
-        // music.play();
+        //add music
+        //var song = game.add.audio('song', 1, true);
+        //song.play();
+        //song.onLoop.add(function(){song.play()}, this);
+        var keyM = game.input.keyboard.addKey(Phaser.Keyboard.M);
+        keyM.onDown.add(function(){game.sound.mute = true}, this);
 
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -436,6 +448,8 @@ function updateTimer(timeInSeconds, timeText, timer) {
 
 function sendUnit1(stu_button) {
     console.log('student sent');
+    var stu_sound = game.add.audio('stu_sound');
+    stu_sound.play();
     var stu = myUnits.create(400, game.world.height - 335 + Math.random() * 30, 'student', 0);
     cool = 3000
     stu_button.inputEnabled = false;
@@ -464,6 +478,8 @@ function sendUnit1(stu_button) {
 
 function sendUnit2(fac_button) {
     console.log('faculty sent');
+    var fac_sound = game.add.audio('fac_sound');
+    fac_sound.play();
     var fac = myUnits.create(400, game.world.height - 375 + Math.random() * 30, 'faculty', 0);
     cool = 3000
     fac_button.inputEnabled = false;
@@ -490,6 +506,8 @@ function sendUnit2(fac_button) {
 
 function sendUnit3(exec_button) {
     console.log('exec sent');
+    var exec_sound = game.add.audio('exec_sound');
+    exec_sound.play();
     var exec = myUnits.create(400, game.world.height - 375 + Math.random() * 30, 'football_player', 4);
     cool = 6000
     exec_button.inputEnabled = false;
@@ -512,13 +530,12 @@ function sendUnit3(exec_button) {
     exec.animations.play('run');
 }
 
-function tower_fire() {
-    console.log('firing');
-}
-
 function deploy_truck(truck_pow, keyQ) {
     console.log('truck sent');
-    var e = truck.create(0, game.world.height - 500, 'truck_body');
+    var bevo_moo = game.add.audio('bevo_moo');
+    bevo_moo.play();
+    var e = truck.create(0, game.world.height - 400, 'truck_body');
+    e.scale.setTo(.5, .5);
     cool = 10000
     truck_pow.inputEnabled = false;
     game.time.events.add(cool, buttonReset, this, truck_pow);
@@ -536,6 +553,8 @@ function deploy_truck(truck_pow, keyQ) {
 
 function deploy_matt(matt_pow, keyW) {
     console.log('matt deployed');
+    var matt_sound = game.add.audio('matt_sound');
+    matt_sound.play();
     var m = matt.create(425, game.world.height - 395, 'matt', 2);
     cool = 10000
     matt_pow.inputEnabled = false;
@@ -575,6 +594,8 @@ function horde_send() {
     }, 100);
 }
 function deploy_horde(horde_pow, keyE) {
+    var horde_sound = game.add.audio('horde_sound');
+    horde_sound.play();
     horde_pow.inputEnabled = false;
     cool = 10000
     game.time.events.add(cool, buttonReset, this, horde_pow);
@@ -592,6 +613,8 @@ function deploy_horde(horde_pow, keyE) {
 
 function make_it_rain(rain_pow, keyR) {
     console.log("making it rain!");
+    var cha_ching = game.add.audio('cha_ching');
+    cha_ching.play();
     rain_pow.inputEnabled = false;
     cool = 10000
     game.time.events.add(cool, buttonReset, this, rain_pow);
@@ -681,7 +704,7 @@ function createPlayer(x,y){
     player.anchor.setTo(.5, .5);
 }
 function playerCollisionHandler(player, ene) {
-    ene.body.velocity.x = 0;
+    //ene.body.velocity.x = 0;
     if (game.input.keyboard.isDown(Phaser.Keyboard.F)){
         ene.health -= 5;
     } else if (game.input.keyboard.isDown(Phaser.Keyboard.D)){

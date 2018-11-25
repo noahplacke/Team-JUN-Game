@@ -15,7 +15,7 @@ mascot_raid.tutorial.prototype = {
         var text1 = game.add.text(50, 330, "Control your player with arrow keys and the SDF keys for attacks", style1);
         var text1 = game.add.text(50, 405, "S is strong attack - D is medium - F is weak", style1);
         var text1 = game.add.text(50, 470, "ONLY UNITS CAN ATTACK THE ENEMY TOWER", style1);
-        var text1 = game.add.text(50, 540, "Send units to consistently to get enemy tower health to zero", style1);
+        var text1 = game.add.text(50, 540, "Send units consistently to get enemy tower health to zero", style1);
         var text1 = game.add.text(50, 610, "We apologize for this wall of text", style1);
         var next = game.add.button(1200, 650, 'button', "", this, 3, 3, 3);
         next.scale.setTo(1.5, 1.5);

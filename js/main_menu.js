@@ -15,6 +15,7 @@ mascot_raid.main_menu.prototype = {
 		game.load.image('main_menu', 'assets/main_menu.png');
 		game.load.spritesheet('game_logo', 'assets/game_logo.png', 300, 300);
 		game.load.spritesheet('button', 'assets/button_sprite_sheet.png', 64, 64, 5);
+        game.load.audio('song', 'assets/audio/texas_song.mp3');
 		console.log("Main");
 	},
 
@@ -23,6 +24,11 @@ mascot_raid.main_menu.prototype = {
 		//main_menu will be main menu
 		background = game.add.sprite(0, 0, 'main_menu');
 		var logo = game.add.sprite(250, 200, 'game_logo');
+        
+        //play music
+        var song = game.add.audio('song', 1, true);
+        song.play("", 0, .50);
+        song.onLoop.add(function(){song.play()}, this);
 
 		// Buttons
 		var play = game.add.button(270, game.world.height / 2, 'button', "", this, 0, 0, 0);
