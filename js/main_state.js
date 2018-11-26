@@ -1,37 +1,37 @@
-var ut_health;
-var am_health;
-var ut_tower;
-var am_tower;
-var myUnits;
-var truck;
-var matt;
-var horde;
-var rain;
-var balls;
-var enemy;
-var lvl1;
-var lvl2;
-var lvl3;
-var cursors;
-var myTower;
-var ram_count = 20;
-var player;
-var dir = "right";
+var ut_health,
+    am_health,
+    ut_tower,
+    am_tower,
+    myUnits,
+    truck,
+    matt,
+    horde,
+    rain,
+    balls,
+    enemy,
+    lvl1,
+    lvl2,
+    lvl3,
+    cursors,
+    myTower,
+    ram_count = 20,
+    player,
+    dir = "right";
+var f = 0, d = 0, s = 0;
 
 var ballTime = 0;
 var ball;
 
-mascot_raid.main_state = function() {};
+mascot_raid.main_state = function () {};
 mascot_raid.main_state.prototype = {
 
-    preload: function() {
+    preload: function () {
 
         game.load.image('background', 'assets/level_background.png');
         game.load.image('ground', 'assets/ground.png');
         game.load.spritesheet('tree', 'assets/trees.png');
         game.load.spritesheet('powerups', 'assets/powerup_buttons.png', 64, 64, 5);
         game.load.spritesheet('button', 'assets/button_sprite_sheet.png', 64, 64, 5);
-        game.load.audio('sprint1_music', 'assets/sprint1_music.mp3')
         game.load.image('ball', 'assets/ball.png');
         game.load.image('money', 'assets/money.png');
         game.load.spritesheet('lvl1', 'assets/enemy.png', 32, 32);
@@ -48,7 +48,6 @@ mascot_raid.main_state.prototype = {
         game.load.spritesheet('football_player', 'assets/football_player.png', 37.75, 60, 8);
         game.load.spritesheet('ene_football_player', 'assets/ene_football_player.png', 37.75, 60, 8);
         game.load.image('bevo', 'assets/bevo.png');
-        game.load.image('tower', 'assets/tower.png');
         game.load.image('truck_body', 'assets/truck/full.png');
         game.load.image('truck_wheel', 'assets/truck/wheel.png');
         game.load.spritesheet('matt', 'assets/matt_sprites.png', 165, 57, 49);
@@ -68,13 +67,15 @@ mascot_raid.main_state.prototype = {
 
     },
 
-    create: function() {
+    create: function () {
         //add music
         //var song = game.add.audio('song', 1, true);
         //song.play();
         //song.onLoop.add(function(){song.play()}, this);
         var keyM = game.input.keyboard.addKey(Phaser.Keyboard.M);
-        keyM.onDown.add(function(){game.sound.mute = true}, this);
+        keyM.onDown.add(function () {
+            game.sound.mute = true
+        }, this);
 
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -97,9 +98,15 @@ mascot_raid.main_state.prototype = {
         am_tower = bases.create(1920, 0, 'landmarks', 1);
         am_tower.health = 50000;
 
-        ut_health = game.add.text(50, 50, ut_tower.health, { fontSize: '42px', fill: 'black' });
+        ut_health = game.add.text(50, 50, ut_tower.health, {
+            fontSize: '42px',
+            fill: 'black'
+        });
         ut_health.fixedToCamera = true;
-        am_health = game.add.text(1250, 50, am_tower.health, { fontSize: '42px', fill: 'black' });
+        am_health = game.add.text(1250, 50, am_tower.health, {
+            fontSize: '42px',
+            fill: 'black'
+        });
         am_health.fixedToCamera = true;
 
 
@@ -132,7 +139,7 @@ mascot_raid.main_state.prototype = {
         exit.scale.setTo(1.5, 1.5);
         exit.fixedToCamera = true;
         exit.onInputDown.add(exit_pressed, this);
-        
+
         //creating pause menu for tips
         var pause_button = game.add.button(800, 650, 'button', "", this, 4, 4, 4);
         pause_button.scale.setTo(1.5, 1.5);
@@ -155,7 +162,7 @@ mascot_raid.main_state.prototype = {
         exec_button.onInputDown.add(sendUnit3, this);
         var keyC = game.input.keyboard.addKey(Phaser.Keyboard.C);
         keyC.onDown.add(sendUnit3, this);
-        
+
         //create Player unit
         createPlayer(200, game.world.height - 300);
         player.body.collideWorldBounds = true;
@@ -189,7 +196,7 @@ mascot_raid.main_state.prototype = {
         rain.physicsBodyType = Phaser.Physics.ARCADE;
 
         myPowers.add(truck, matt, horde, rain);
-        
+
         //add in timer
         timer = game.time.create(false);
 
@@ -200,7 +207,7 @@ mascot_raid.main_state.prototype = {
         enemy.physicsBodyType = Phaser.Physics.ARCADE;
         enemy.setAll('health', 0);
         enemy.setAll('attack', 0);
-        var unit_timer = (function() {
+        var unit_timer = (function () {
             setInterval(deploy_lvl1, 2000);
             setInterval(deploy_lvl2, 3000);
             setInterval(deploy_lvl3, 6000);
@@ -223,7 +230,7 @@ mascot_raid.main_state.prototype = {
 
         cursors = game.input.keyboard.createCursorKeys();
         game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR]);
-        
+
         //camera follows player
         game.camera.follow(player);
         game.camera.deadzone = new Phaser.Rectangle(centerX - 200, 0, 1200, 800);
@@ -233,7 +240,7 @@ mascot_raid.main_state.prototype = {
 
     },
 
-    update: function() {
+    update: function () {
         game.physics.arcade.overlap(balls, enemy, collisionHandler, null, this);
         setInterval(game.physics.arcade.overlap(myUnits, enemy, collisionHandler2, null, this), 1000);
         game.physics.arcade.overlap(rain, enemy, collisionHandler3, null, this);
@@ -323,8 +330,9 @@ function collisionHandler3(money, ene) {
     ene.kill();
 
 }
-function truckCollisionHandler(truck, ene){
-    if(ram_count > 0){
+
+function truckCollisionHandler(truck, ene) {
+    if (ram_count > 0) {
         ene.kill();
         ram_count--;
     } else {
@@ -332,7 +340,8 @@ function truckCollisionHandler(truck, ene){
         ram_count = 20;
     }
 }
-function utCollisionHandler(base, units){
+
+function utCollisionHandler(base, units) {
     units.body.velocity.x = 0;
     var timeDelay = 0;
     if (game.time.now > timeDelay) {
@@ -341,14 +350,17 @@ function utCollisionHandler(base, units){
     }
     ut_health.text = base.health;
     if (base.health <= 0) {
-        var over = game.add.text(game.world.centerX/2, game.world.centerY/2, "Game Over", { fontSize: '72px', fill: 'black' });
+        var over = game.add.text(game.world.centerX / 2, game.world.centerY / 2, "Game Over", {
+            fontSize: '72px',
+            fill: 'black'
+        });
         over.fixedToCamera = true;
         game.paused = true;
         ut_health.text = 0;
     }
 }
 
-function amCollisionHandler(base, units){
+function amCollisionHandler(base, units) {
     units.body.velocity.x = 0;
     var timeDelay = 0;
     if (game.time.now > timeDelay) {
@@ -357,7 +369,10 @@ function amCollisionHandler(base, units){
     }
     am_health.text = base.health;
     if (base.health <= 0) {
-        var over = game.add.text(game.world.centerX/2, game.world.centerY/2, "You Win!", { fontSize: '72px', fill: 'black' });
+        var over = game.add.text(game.world.centerX / 2, game.world.centerY / 2, "You Win!", {
+            fontSize: '72px',
+            fill: 'black'
+        });
         over.fixedToCamera = true;
         game.paused = true;
         am_health.text = 0;
@@ -431,7 +446,9 @@ function cooldown(x, y, time) {
     //timeText = game.add.text(x + 15, y - 20, timeInSeconds);
     //timer = game.time.events.loop(Phaser.Timer.SECOND, updateTimer, this, timeInSeconds, timeText, timer);
     cover = game.add.sprite(x - 10, y - 80, 'cover');
-    game.time.events.add(time, function(){cover.kill()}, cover);
+    game.time.events.add(time, function () {
+        cover.kill()
+    }, cover);
 }
 
 function updateTimer(timeInSeconds, timeText, timer) {
@@ -471,7 +488,9 @@ function sendUnit1(stu_button) {
     var cov = game.add.sprite(game.camera.y + 400, 675, 'cover');
     cov.fixedToCamera = true;
     //game.time.events.add(cool, function(){stu_button.frame = 0}, stu_button);
-    game.time.events.add(cool, function(){cov.destroy()}, stu_button);
+    game.time.events.add(cool, function () {
+        cov.destroy()
+    }, stu_button);
     stu.animations.add('run', [0, 1, 2, 3, 4, 5, 6, 7], 8, true);
     stu.animations.play('run');
 }
@@ -498,7 +517,9 @@ function sendUnit2(fac_button) {
     cov.fixedToCamera = true;
     //fac_button.loadTexture('cover');
     //game.time.events.add(cool, function(){fac_button.loadTexture('unit_buttons', 1)}, fac_button);
-    game.time.events.add(cool, function(){cov.destroy()}, fac_button);
+    game.time.events.add(cool, function () {
+        cov.destroy()
+    }, fac_button);
     fac.animations.add('run', [0, 1, 2, 3, 4, 5, 6, 7], 8, true);
     fac.animations.play('run');
 
@@ -516,7 +537,9 @@ function sendUnit3(exec_button) {
     exec.scale.setTo(2, 2);
     exec.health = 1000;
     exec.attack = 20;
-    exec.text = game.add.text(exec.x - 390, exec.y - 450, exec.health, {font: '12px'});
+    exec.text = game.add.text(exec.x - 390, exec.y - 450, exec.health, {
+        font: '12px'
+    });
     exec.addChild(exec.text);
     keyC = game.input.keyboard.addKey(Phaser.Keyboard.C);
     keyC.enabled = false;
@@ -525,7 +548,9 @@ function sendUnit3(exec_button) {
     cov.fixedToCamera = true;
     //exec_button.loadTexture('cover');
     //game.time.events.add(cool, function(){exec_button.loadTexture('unit_buttons', 2)}, exec_button);
-    game.time.events.add(cool, function(){cov.destroy()}, exec_button);
+    game.time.events.add(cool, function () {
+        cov.destroy()
+    }, exec_button);
     exec.animations.add('run', [3, 4, 5, 6, 7], 5, true);
     exec.animations.play('run');
 }
@@ -547,8 +572,11 @@ function deploy_truck(truck_pow, keyQ) {
     var cov = game.add.sprite(game.camera.y + 50, 675, 'cover');
     cov.fixedToCamera = true;
     //game.time.events.add(cool, function(){truck_pow.visible = true}, truck_pow);
-    game.time.events.add(cool, function(){cov.destroy()}, truck_pow);
+    game.time.events.add(cool, function () {
+        cov.destroy()
+    }, truck_pow);
     e.body.velocity.x = 500;
+    special = true;
 }
 
 function deploy_matt(matt_pow, keyW) {
@@ -565,20 +593,26 @@ function deploy_matt(matt_pow, keyW) {
     m.scale.setTo(2.5, 2.5);
     m.health = 10000;
     m.attack = 150;
-    m.text = game.add.text(m.x - 350, m.y - 420, m.health, {font: '12px'});
+    m.text = game.add.text(m.x - 350, m.y - 420, m.health, {
+        font: '12px'
+    });
     m.addChild(m.text);
     var cov = game.add.sprite(game.camera.y + 120, 675, 'cover');
     cov.fixedToCamera = true;
     //matt_pow.loadTexture('cover');
     //game.time.events.add(cool, function(){matt_pow.loadTexture('powerups', 1)}, matt_pow);
-    game.time.events.add(cool, function(){cov.destroy()}, matt_pow);
+    game.time.events.add(cool, function () {
+        cov.destroy()
+    }, matt_pow);
     m.animations.add('attack', [2, 6, 7, 8, 9, 10, 11], 7, true);
     m.animations.play('attack');
+    special = true;
 }
 
 var horde_num = 0;
+
 function horde_send() {
-    setTimeout(function() {
+    setTimeout(function () {
         var h = horde.create(400, game.world.height - 325 + Math.random() * 30, 'horde', 4);
         h.scale.x *= -1;
         h.body.velocity.x = 250;
@@ -593,6 +627,7 @@ function horde_send() {
         }
     }, 100);
 }
+
 function deploy_horde(horde_pow, keyE) {
     var horde_sound = game.add.audio('horde_sound');
     horde_sound.play();
@@ -606,9 +641,11 @@ function deploy_horde(horde_pow, keyE) {
     cov.fixedToCamera = true;
     //horde_pow.loadTexture('cover');
     //game.time.events.add(cool, function(){horde_pow.loadTexture('powerups', 2)}, horde_pow);
-    game.time.events.add(cool, function(){cov.destroy()}, horde_pow);
+    game.time.events.add(cool, function () {
+        cov.destroy()
+    }, horde_pow);
     horde_send()
-    
+    special = true;
 }
 
 function make_it_rain(rain_pow, keyR) {
@@ -625,29 +662,38 @@ function make_it_rain(rain_pow, keyR) {
     cov.fixedToCamera = true;
     //rain_pow.loadTexture('cover');
     //game.time.events.add(cool, function(){rain_pow.loadTexture('powerups', 3)}, rain_pow);
-    game.time.events.add(cool, function(){cov.destroy()}, rain_pow);
+    game.time.events.add(cool, function () {
+        cov.destroy()
+    }, rain_pow);
     for (i = 0; i < 50; i++) {
         var e = rain.create(Math.random() * game.world.width, 0, 'money', 0);
         e.frame = 0;
         e.body.velocity.y = 200;
     }
+    special = true;
 }
 
-function playerUpdate(){
+function playerUpdate() {
     //game.physics.arcade.collide(something, something);
     player.body.velocity.x = 0;
     player.body.velocity.y = 0;
+    if (d > 0) {
+        d--;
+    }
+    if (s > 0) {
+        s--;
+    }
 
-    if (cursors.left.isDown){
-        if (dir != "left"){
+    if (cursors.left.isDown) {
+        if (dir != "left") {
             player.scale.x *= -1;
         }
         dir = "left";
-        if (cursors.up.isDown) {
+        if (cursors.up.isDown && (player.world.y > 450)) {
             player.body.velocity.x = -150;
             player.body.velocity.y = -150;
             player.animations.play('walk');
-        } else if (cursors.down.isDown) {
+        } else if (cursors.down.isDown && (player.world.y < 600)) {
             player.body.velocity.x = -150;
             player.body.velocity.y = 150;
             player.animations.play('walk');
@@ -655,17 +701,17 @@ function playerUpdate(){
             player.body.velocity.x = -150;
             player.animations.play('walk');
         }
-    
-    } else if (cursors.right.isDown){
+
+    } else if (cursors.right.isDown) {
         if (dir != "right") {
             player.scale.x *= -1;
         }
         dir = "right";
-        if (cursors.up.isDown) {
+        if (cursors.up.isDown && (player.world.y > 450)) {
             player.body.velocity.x = 150;
             player.body.velocity.y = -150;
             player.animations.play('walk');
-        } else if (cursors.down.isDown) {
+        } else if (cursors.down.isDown && (player.world.y < 600)) {
             player.body.velocity.x = 150;
             player.body.velocity.y = 150;
             player.animations.play('walk');
@@ -673,53 +719,60 @@ function playerUpdate(){
             player.body.velocity.x = 150;
             player.animations.play('walk');
         }
-    } else if (cursors.up.isDown){
+    } else if (cursors.up.isDown && (player.world.y > 450)) {
         player.body.velocity.y = -150;
         player.animations.play('walk');
-    } else if (cursors.down.isDown) {
+    } else if (cursors.down.isDown && (player.world.y < 600)) {
         player.body.velocity.y = 150;
         player.animations.play('walk');
     } else if (game.input.keyboard.isDown(Phaser.Keyboard.F)) {
         player.animations.play('attack1');
-    } else if (game.input.keyboard.isDown(Phaser.Keyboard.D)) {
+    } else if (game.input.keyboard.isDown(Phaser.Keyboard.D) && (d == 0)) {
         player.animations.play('attack2');
-    }
-    else if (game.input.keyboard.isDown(Phaser.Keyboard.S)) {
+        d = 50;
+    } else if (game.input.keyboard.isDown(Phaser.Keyboard.S) && (s == 0)) {
         player.animations.play('attack3');
-    } else {
+        s = 500;
+    } else if(!player.animations.currentAnim.isPlaying){
         player.animations.play('still');
     }
 }
-function createPlayer(x,y){
+
+function createPlayer(x, y) {
     player = game.add.sprite(x, y, 'player');
     game.physics.arcade.enable(player);
     player.body.bounce.y = 0.2;
     player.body.colliderWorldBounds = true;
-    player.animations.add('still', [0,1,2,3,4,5,6,7,8,9], 10, true);
-    player.animations.add('walk', [10, 11, 12, 13, 14, 15], 10, true);
-    player.animations.add('double', [20, 21, 22, 23, 24, 25, 26, 27, 28, 29], 10, true);
-    player.animations.add('attack1', [47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68], 20, true);
-    player.animations.add('attack2', [32,33,34,35,36,37,38,39,40,41,42,43,44], 20, true);
-    player.animations.add('attack3', [71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98], 20, true);
+    player.animations.add('still', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 10, true);
+    player.animations.add('walk', [10, 11, 12, 13, 14, 15], 10, false);
+    player.animations.add('double', [20, 21, 22, 23, 24, 25, 26, 27, 28, 29], 10, false);
+    player.animations.add('attack1', [47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68], 20, false);
+    player.animations.add('attack2', [32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44], 20, false);
+    player.animations.add('attack3', [71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98], 20, false);
     player.anchor.setTo(.5, .5);
 }
+
 function playerCollisionHandler(player, ene) {
     //ene.body.velocity.x = 0;
-    if (game.input.keyboard.isDown(Phaser.Keyboard.F)){
+    if (game.input.keyboard.isDown(Phaser.Keyboard.F) && (f == 0)) {
         ene.health -= 5;
-    } else if (game.input.keyboard.isDown(Phaser.Keyboard.D)){
+    } else if (game.input.keyboard.isDown(Phaser.Keyboard.D) && (d == 0)) {
         ene.health -= 20;
-    } else if (game.input.keyboard.isDown(Phaser.Keyboard.S)){
+    } else if (game.input.keyboard.isDown(Phaser.Keyboard.S) && (s == 0)) {
         ene.kill();
     }
-    if (ene.health <= 0){
+    if (ene.health <= 0) {
         ene.kill();
     }
 }
 
 function pause_menu() {
     game.paused = true;
-    var style1 = {font: "35px Arial", fill: "#00000", align: "center"};
+    var style1 = {
+        font: "35px Arial",
+        fill: "#00000",
+        align: "center"
+    };
     text1 = game.add.text(game.camera.x + 350, 100, "GAME PAUSED -- CLICK ANYWHERE TO CONTINUE", style1);
     text1.fixedToCamera = true;
     text2 = game.add.text(game.camera.x + 350, 150, "QWER to use Power Ups", style1);
