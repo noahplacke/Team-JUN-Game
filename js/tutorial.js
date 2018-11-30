@@ -32,6 +32,11 @@ var keyE,
     keyQ,
     special = false;
 
+var keyZ,
+    keyX,
+    keyC,
+    unitSent = false;
+
 var tutStr = "Press the Arrow keys to move!";
 var tutText;
 
@@ -168,6 +173,7 @@ mascot_raid.tutorial.prototype = {
 
         var next = game.add.button(1200, 650, 'button', "", this, 3, 3, 3);
         next.scale.setTo(1.5, 1.5);
+        next.fixedToCamera = true;
         next.onInputDown.add(next_pressed, this);
 
         //add buttons to send units
@@ -252,7 +258,7 @@ mascot_raid.tutorial.prototype = {
 
     update: function () {
         game.physics.arcade.overlap(balls, enemy, collisionHandler, null, this);
-        setInterval(game.physics.arcade.overlap(myUnits, enemy, collisionHandler2, null, this), 1000);
+        //setInterval(game.physics.arcade.overlap(myUnits, enemy, collisionHandler2, null, this), 1000);
         game.physics.arcade.overlap(rain, enemy, collisionHandler3, null, this);
         game.physics.arcade.overlap(truck, enemy, truckCollisionHandler, null, this);
         game.physics.arcade.overlap(ut_tower, enemy, utCollisionHandler, null, this);
@@ -291,6 +297,7 @@ mascot_raid.tutorial.prototype = {
             });
             if (game.input.keyboard.isDown(Phaser.Keyboard.Z) || game.input.keyboard.isDown(Phaser.Keyboard.X) || game.input.keyboard.isDown(Phaser.Keyboard.C)) {
                 tut++;
+                console.log('unit sent')
             }
         }
 
@@ -305,7 +312,7 @@ mascot_raid.tutorial.prototype = {
         }
         playerUpdate();
 
-        console.log(tut);
+        //console.log('tut');
 
 
         //scroll the map by dragging with mouse
