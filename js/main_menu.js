@@ -23,7 +23,7 @@ mascot_raid.main_menu.prototype = {
 
 		//main_menu will be main menu
 		background = game.add.sprite(0, 0, 'main_menu');
-		var logo = game.add.sprite(250, 200, 'game_logo');
+		var logo = game.add.sprite(550, 200, 'game_logo');
         
         //play music
         var song = game.add.audio('song', 1, true);
@@ -31,8 +31,8 @@ mascot_raid.main_menu.prototype = {
         song.onLoop.add(function(){song.play()}, this);
 
 		// Buttons
-		var play = game.add.button(270, game.world.height / 2, 'button', "", this, 0, 0, 0);
-		var credits = game.add.button(420, game.world.height / 2, 'button', "", this, 2, 2, 2);
+		var play = game.add.button(570, game.world.height / 2, 'button', "", this, 0, 0, 0);
+		var credits = game.add.button(720, game.world.height / 2, 'button', "", this, 2, 2, 2);
 		play.frame = 0;
         play.scale.setTo(1.5, 1.5);
 		credits.frame = 2;
