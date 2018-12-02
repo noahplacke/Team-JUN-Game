@@ -152,7 +152,6 @@ mascot_raid.tutorial.prototype = {
         var rain_pow = game.add.button(260, 675, 'powerups', "", this, 3, 3, 3);
         rain_pow.fixedToCamera = true;
         rain_pow.onInputDown.add(make_it_rain, this);
-
         keyR.onDown.add(make_it_rain, this);
         var truck_pow = game.add.button(50, 675, 'powerups', "", this, 0, 0, 0);
         truck_pow.fixedToCamera = true;
@@ -295,10 +294,16 @@ mascot_raid.tutorial.prototype = {
                 fontSize: '42px',
                 fill: 'black'
             });
-            if (game.input.keyboard.isDown(Phaser.Keyboard.Z) || game.input.keyboard.isDown(Phaser.Keyboard.X) || game.input.keyboard.isDown(Phaser.Keyboard.C)) {
-                tut++;
-                console.log('unit sent')
-            }
+            keyZ = game.input.keyboard.addKey(Phaser.Keyboard.Z);
+            keyX = game.input.keyboard.addKey(Phaser.Keyboard.X);
+            keyC = game.input.keyboard.addKey(Phaser.Keyboard.C);
+            keyZ.onDown.add(inc_tut, this);
+            keyX.onDown.add(inc_tut, this);
+            keyC.onDown.add(inc_tut, this);
+//            if (game.input.keyboard.isDown(Phaser.Keyboard.Z) || game.input.keyboard.isDown(Phaser.Keyboard.X) || game.input.keyboard.isDown(Phaser.Keyboard.C)) {
+//                tut++;
+//                console.log('unit sent')
+//            }
         }
 
         if (tut == 3) {
@@ -335,4 +340,8 @@ mascot_raid.tutorial.prototype = {
 
 function next_pressed() {
     game.state.start('main_state');
+}
+
+function inc_tut() {
+    tut++
 }
